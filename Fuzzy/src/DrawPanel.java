@@ -20,14 +20,14 @@ class DrawPanel extends JComponent{
 	
 	private static final long serialVersionUID = 1L;
 	Image image;
-	private final int RES = 28;
-	private final int XDIMENSION, YDIMENSION;
+	private final int RES;
+	protected final int XDIMENSION, YDIMENSION;
 	private int xxDimension;
 	private int yyDimension;
 	Graphics2D graphics2D;
-	int currentX, currentY, oldX, oldY;
-	int drawnCoord[][];
-	int gridCoord[][];//hi-res matrix
+	protected int currentX, currentY, oldX, oldY;
+	protected static volatile int drawnCoord[][];
+	protected static volatile int gridCoord[][];//hi-res matrix
 	protected ArrayList<int[][]> trainingList = new ArrayList<int[][]>();
 	protected ArrayList<String> sampleChar = new ArrayList<String>();
 	private int sampleCount = 0;
@@ -36,12 +36,13 @@ class DrawPanel extends JComponent{
 	//OFF-0, MATRIX-1, PIXELS-2, MATRIX_AND_PIXELS-3
 	int debug = 4;
 
-	public DrawPanel(int X, int Y){
-		XDIMENSION = X;
-		YDIMENSION = Y;
+	public DrawPanel(int multiplier){
+		XDIMENSION = 7 * multiplier;
+		YDIMENSION = 9 * multiplier;
+		RES = 28/multiplier;
+		
+
 		init();
-		
-		
 		
 		setDoubleBuffered(false);
 		
@@ -103,9 +104,9 @@ class DrawPanel extends JComponent{
 	
 	private void init(){
 		hopfield = new Hopfield(XDIMENSION,YDIMENSION);
+		drawnCoord = new int[XDIMENSION][YDIMENSION];
 		xxDimension = XDIMENSION *2;
 		yyDimension = YDIMENSION *2;
-		drawnCoord = new int[XDIMENSION][YDIMENSION];
 		gridCoord = new int[xxDimension][yyDimension];
 	}
 	

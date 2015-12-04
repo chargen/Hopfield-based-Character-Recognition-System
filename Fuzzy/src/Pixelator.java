@@ -12,18 +12,19 @@ import javax.swing.JComponent;
 public class Pixelator extends JComponent{
 	
 	private static final long serialVersionUID = 1L;
-	private final int RES = 28;
-	private final int XDIMENSION;
-	private final int YDIMENSION;
+	private final int RES;
+	private final int XDIMENSION, YDIMENSION;
 	Image image;
 	Graphics2D graphics2D;
 	int currentX, currentY, oldX, oldY;
-	protected static volatile int[][] coord;
+	protected int[][] coord;
 	ArrayList<Integer[]> pixCoord = new ArrayList<Integer[]>();
 
-	protected Pixelator(int X, int Y){
-		XDIMENSION = X;
-		YDIMENSION = Y;
+	protected Pixelator(int multiplier){
+		XDIMENSION = 7 * multiplier;
+		YDIMENSION = 9 * multiplier;
+		RES = 28 / multiplier;
+		
 		coord = null;
 	}
 

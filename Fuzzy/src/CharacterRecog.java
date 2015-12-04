@@ -8,31 +8,33 @@ import javax.swing.event.DocumentListener;
 
 
 public class CharacterRecog{
-	
-	private static int XDIMENSION = 7;
-	private static int YDIMENSION = 9;
+
+	protected static final int XDIMENSION = 7;
+	protected static final int YDIMENSION = 9;
 	protected static Pixelator pixelPad;
 	protected static DrawPanel drawPad;
-	JFrame frame = new JFrame("Fuzzy Character Recognition");
+	static JFrame frame = new JFrame("Fuzzy Character Recognition");
 	protected static String fontChar;
 	protected static boolean passed = false;
-	protected static int multiplier = 1;
+	private static int multiplier;
 	
-	public CharacterRecog(){
+	public CharacterRecog(int mult){
+		multiplier = mult;
+		
+		pixelPad = new Pixelator(multiplier);
+		drawPad = new DrawPanel(multiplier);
 		init();
 	}
 	
-	private void init(){
-		pixelPad = new Pixelator(XDIMENSION, YDIMENSION);
+	protected static void init(){
+		
 		Container content = frame.getContentPane();
 		content.setLayout(new CardLayout());
 		
 		final JPanel contentPane = new JPanel();
 		contentPane.setLayout(new GridLayout(1, 4));
 		content.add(contentPane);
-		
-		drawPad = new DrawPanel(XDIMENSION, YDIMENSION);
-		//sets the padDraw in the center		
+			
 		contentPane.add(drawPad);
 		contentPane.add(pixelPad);
 		
@@ -73,13 +75,13 @@ public class CharacterRecog{
 		
 		clearButton.setBounds(25, 25, 100, 25);
 		addButton.setBounds(135, 25, 100, 25);
-		final JTextField trainChar = new JTextField();
-		trainChar.setDocument(new TextFieldLimit(1));
+		final JTextField sampleChar = new JTextField();
+		sampleChar.setDocument(new TextFieldLimit(1));
 		final JTextField font = new JTextField();
 		font.setDocument(new TextFieldLimit(4));
 		text.add(character);
 		text.add(cStyle);
-		text.add(trainChar);
+		text.add(sampleChar);
 		text.add(font);
 		text.setBounds(25, 55, 200, 50);
 		panel.add(clearButton);
@@ -91,17 +93,18 @@ public class CharacterRecog{
 		panel.add(trainButton);
 		slider.setBounds(25, 155, 100, 25);
 		panel.add(slider);
-		slider.setValue(1);
+		slider.setValue(multiplier);
 		slider.addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
-				int xDmn = XDIMENSION * slider.getValue();
-				int yDmn = YDIMENSION * slider.getValue();
-				drawPad = new DrawPanel(xDmn, yDmn);
-				pixelPad = new Pixelator(xDmn, yDmn);
-				pixelPad.setCoord(drawPad.drawnCoord);
-				contentPane.repaint();
-				System.out.printf("(%d , %d)", xDmn, yDmn);
+				if(slider.getValueIsAdjusting()){
+					multiplier = slider.getValue();
+				}
+				//drawPad.drawnCoord = new int[XDIMENSION * multiplier][YDIMENSION * multiplier];
+				//drawPad = new DrawPanel(multiplier);
+				//pixelPad = new Pixelator(multiplier);
+				new CharacterRecog(multiplier);
+
 			}			
 		});
 		//END JFrame Components
@@ -115,7 +118,7 @@ public class CharacterRecog{
 				passed = false;
 				fontChar = null;
 				font.setText("");
-				trainChar.setText("");
+				sampleChar.setText("");
 			}
 		});
 		
@@ -123,14 +126,14 @@ public class CharacterRecog{
 		 * Disables trainButton until both text fields are filled
 		 */
 		addButton.setEnabled(false);
-		trainChar.getDocument().addDocumentListener(new DocumentListener(){
+		sampleChar.getDocument().addDocumentListener(new DocumentListener(){
 			public void changedUpdate(DocumentEvent e){changed();}
 			@Override
 			public void insertUpdate(DocumentEvent arg0) {changed();}
 			@Override
 			public void removeUpdate(DocumentEvent arg0) {changed();}
 			public void changed(){
-				if(trainChar.getText().equals("") || font.getText().equals("")){
+				if(sampleChar.getText().equals("") || font.getText().equals("")){
 					addButton.setEnabled(false);
 					}else{ addButton.setEnabled(true);}
 			}
@@ -142,7 +145,7 @@ public class CharacterRecog{
 			@Override
 			public void removeUpdate(DocumentEvent arg0) {changed();}
 			public void changed(){
-				if(font.getText().equals("") || trainChar.getText().equals("")){ 
+				if(font.getText().equals("") || sampleChar.getText().equals("")){ 
 					addButton.setEnabled(false);
 				}else{addButton.setEnabled(true);}
 			}
@@ -151,7 +154,7 @@ public class CharacterRecog{
 		//'Add Sample' button listener
 		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				String fChar = trainChar.getText();
+				String fChar = sampleChar.getText();
 				String charFont = font.getText();
 				drawPad.setSampleChar(fChar +"-"+ charFont);
 				passed = true;
@@ -169,6 +172,6 @@ public class CharacterRecog{
 	
 	public static void main(String[] args){
 		@SuppressWarnings("unused")
-		CharacterRecog myProgram = new CharacterRecog();
+		CharacterRecog myProgram = new CharacterRecog(1);
 	}
 }
