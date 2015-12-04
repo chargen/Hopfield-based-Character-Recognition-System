@@ -127,9 +127,9 @@ public class CharacterRecog{
 			public void actionPerformed(ActionEvent e){
 				String fChar = trainChar.getText();
 				String charFont = font.getText();
-				drawPad.setTrainedChar(fChar +"-"+ charFont);
+				drawPad.setSampleChar(fChar +"-"+ charFont);
 				passed = true;
-				drawPad.trainNetwork();
+				drawPad.addSample();
 			}
 		});
 		contentPane.add(matchPane);

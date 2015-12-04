@@ -29,8 +29,8 @@ class DrawPanel extends JComponent{
 	int[][] drawnCoord = new int[XDIMENSION][YDIMENSION];
 	int[][] gridCoord = new int[XXDIMENSION][YYDIMENSION];//hi-res matrix
 	protected ArrayList<int[][]> trainingList = new ArrayList<int[][]>();
-	protected ArrayList<String> trainedChar = new ArrayList<String>();
-	private int trainCount = 0;
+	protected ArrayList<String> sampleChar = new ArrayList<String>();
+	private int sampleCount = 0;
 	private Hopfield hopfield = new Hopfield(XDIMENSION,YDIMENSION);
 	//set debug mode by adjusting this value.
 	//OFF-0, MATRIX-1, PIXELS-2, MATRIX_AND_PIXELS-3
@@ -189,18 +189,18 @@ class DrawPanel extends JComponent{
 		}
 	}
 	
-	protected void trainNetwork(){
+	protected void addSample(){
 		trainingList.add(drawnCoord);
 		if(debug > 3){
-			System.out.println("\nTRAINING:");
-			printTrained(trainCount);
-			System.out.println("Trained character: " + trainedChar.get(trainCount));
+			System.out.println("\nADDING:");
+			printSample(sampleCount);
+			System.out.println("Added character: " + sampleChar.get(sampleCount));
 		}
-		trainCount++;
+		sampleCount++;
 	}
 	
 	//debugger
-	private void printTrained(int i){
+	private void printSample(int i){
 		for(int y = 0; y < YDIMENSION; y++){
 			for(int x = 0; x < XDIMENSION; x++){
 				if(trainingList.get(i)[x][y] >= 0){
@@ -236,14 +236,14 @@ class DrawPanel extends JComponent{
 	}
 	
 	//add new matrix to the arrayList
-	protected void setTrainedChar(String tChar){
+	protected void setSampleChar(String tChar){
 		if(!CharacterRecog.passed){
-			trainedChar.add(trainCount, tChar);
+			sampleChar.add(sampleCount, tChar);
 		}
 	}
 	
 	private void hopfieldLearning(){
-		hopfield.init(trainingList,gridCoord,trainedChar);
+		hopfield.init(trainingList,gridCoord,sampleChar);
 	}
 	
 }
