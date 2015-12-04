@@ -6,7 +6,10 @@ import javax.swing.event.DocumentListener;
 
 
 public class CharacterRecog{
-	protected static Pixelator pixelPad = new Pixelator();
+	
+	private final static int XDIMENSION = 7;
+	private final static int YDIMENSION = 9;
+	protected static Pixelator pixelPad = new Pixelator(XDIMENSION, YDIMENSION);
 	JFrame frame = new JFrame("Fuzzy Character Recognition");
 	protected static String fontChar;
 	protected static boolean passed = false;
@@ -23,11 +26,14 @@ public class CharacterRecog{
 		contentPane.setLayout(new GridLayout(1, 4));
 		content.add(contentPane);
 		
-		final DrawPanel drawPad = new DrawPanel();
+		final DrawPanel drawPad = new DrawPanel(XDIMENSION, YDIMENSION);
 		//sets the padDraw in the center		
 		contentPane.add(drawPad);
 		contentPane.add(pixelPad);
 		
+		final JSlider slider = new JSlider();
+		slider.setMinimum(2);
+		slider.setMaximum(8);
 		JPanel panel = new JPanel();
 		JPanel text = new JPanel();
 		//creates a JPanel		

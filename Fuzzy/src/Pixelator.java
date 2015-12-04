@@ -13,14 +13,17 @@ public class Pixelator extends JComponent{
 	
 	private static final long serialVersionUID = 1L;
 	private final int RES = 28;
-	private final int XDIMENSION = 7, YDIMENSION = 9;
+	private final int XDIMENSION;
+	private final int YDIMENSION;
 	Image image;
 	Graphics2D graphics2D;
 	int currentX, currentY, oldX, oldY;
 	int[][] coord;
 	ArrayList<Integer[]> pixCoord = new ArrayList<Integer[]>();
 
-	protected Pixelator(){
+	protected Pixelator(int X, int Y){
+		XDIMENSION = X;
+		YDIMENSION = Y;
 		coord = null;
 	}
 

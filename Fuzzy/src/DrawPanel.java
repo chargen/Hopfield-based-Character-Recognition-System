@@ -21,22 +21,28 @@ class DrawPanel extends JComponent{
 	private static final long serialVersionUID = 1L;
 	Image image;
 	private final int RES = 28;
-	private final int XDIMENSION = 7, YDIMENSION = 9;
-	private final int XXDIMENSION = XDIMENSION *2;
-	private final int YYDIMENSION = YDIMENSION *2;
+	private final int XDIMENSION, YDIMENSION;
+	private int xxDimension;
+	private int yyDimension;
 	Graphics2D graphics2D;
 	int currentX, currentY, oldX, oldY;
-	int[][] drawnCoord = new int[XDIMENSION][YDIMENSION];
-	int[][] gridCoord = new int[XXDIMENSION][YYDIMENSION];//hi-res matrix
+	int drawnCoord[][];
+	int gridCoord[][];//hi-res matrix
 	protected ArrayList<int[][]> trainingList = new ArrayList<int[][]>();
 	protected ArrayList<String> sampleChar = new ArrayList<String>();
 	private int sampleCount = 0;
-	private Hopfield hopfield = new Hopfield(XDIMENSION,YDIMENSION);
+	private Hopfield hopfield;
 	//set debug mode by adjusting this value.
 	//OFF-0, MATRIX-1, PIXELS-2, MATRIX_AND_PIXELS-3
 	int debug = 4;
 
-	public DrawPanel(){
+	public DrawPanel(int X, int Y){
+		XDIMENSION = X;
+		YDIMENSION = Y;
+		init();
+		
+		
+		
 		setDoubleBuffered(false);
 		
 		//if the mouse is pressed it sets the oldX & oldY
@@ -74,7 +80,7 @@ class DrawPanel extends JComponent{
 		addMouseListener(new MouseAdapter(){
 			public void mouseReleased(MouseEvent e){
 				setDrawnCoord();
-				hopfieldLearning();
+				//hopfieldLearning();
 				try{
 					CharacterRecog.pixelPad.setCoord(drawnCoord);
 					CharacterRecog.pixelPad.pixelate();
@@ -94,6 +100,15 @@ class DrawPanel extends JComponent{
 			}
 		});
 	}
+	
+	private void init(){
+		hopfield = new Hopfield(XDIMENSION,YDIMENSION);
+		xxDimension = XDIMENSION *2;
+		yyDimension = YDIMENSION *2;
+		drawnCoord = new int[XDIMENSION][YDIMENSION];
+		gridCoord = new int[xxDimension][yyDimension];
+	}
+	
 	//initializes the JComponent drawing screens
 	protected void paintComponent(Graphics g){
 		if(image == null){
@@ -122,7 +137,7 @@ class DrawPanel extends JComponent{
 			for(int i = 0; i < YDIMENSION; i++)
 				for(int j = 0; j < XDIMENSION; j++)
 					drawnCoord[j][i] = -1;
-			gridCoord = new int[XXDIMENSION][YYDIMENSION];
+			gridCoord = new int[xxDimension][yyDimension];
 			
 			repaint();
 			CharacterRecog.pixelPad.clear();
@@ -213,8 +228,8 @@ class DrawPanel extends JComponent{
 	}
 	//debugger
 	private void printCoord(){
-		for(int y = 0; y < YYDIMENSION; y++){
-			for(int x = 0; x < XXDIMENSION; x++){
+		for(int y = 0; y < yyDimension; y++){
+			for(int x = 0; x < xxDimension; x++){
 				System.out.print(gridCoord[x][y]);
 			}
 			System.out.println();
@@ -242,8 +257,8 @@ class DrawPanel extends JComponent{
 		}
 	}
 	
-	private void hopfieldLearning(){
+/*	private void hopfieldLearning(){
 		hopfield.init(trainingList,gridCoord,sampleChar);
-	}
+	}*/
 	
 }
