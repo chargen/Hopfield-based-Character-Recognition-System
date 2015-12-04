@@ -17,7 +17,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
 class DrawPanel extends JComponent{
-
+	
 	private static final long serialVersionUID = 1L;
 	Image image;
 	private final int RES = 28;
@@ -31,6 +31,7 @@ class DrawPanel extends JComponent{
 	protected ArrayList<int[][]> trainingList = new ArrayList<int[][]>();
 	protected ArrayList<String> trainedChar = new ArrayList<String>();
 	private int trainCount = 0;
+	private Hopfield hopfield = new Hopfield(XDIMENSION,YDIMENSION);
 	//set debug mode by adjusting this value.
 	//OFF-0, MATRIX-1, PIXELS-2, MATRIX_AND_PIXELS-3
 	int debug = 4;
@@ -73,6 +74,7 @@ class DrawPanel extends JComponent{
 		addMouseListener(new MouseAdapter(){
 			public void mouseReleased(MouseEvent e){
 				setDrawnCoord();
+				hopfieldLearning();
 				try{
 					CharacterRecog.pixelPad.setCoord(drawnCoord);
 					CharacterRecog.pixelPad.pixelate();
@@ -232,11 +234,16 @@ class DrawPanel extends JComponent{
 		}
 		System.out.println("\n--------------------\n");
 	}
-
+	
+	//add new matrix to the arrayList
 	protected void setTrainedChar(String tChar){
 		if(!CharacterRecog.passed){
 			trainedChar.add(trainCount, tChar);
 		}
+	}
+	
+	private void hopfieldLearning(){
+		hopfield.init(trainingList,gridCoord,trainedChar);
 	}
 	
 }

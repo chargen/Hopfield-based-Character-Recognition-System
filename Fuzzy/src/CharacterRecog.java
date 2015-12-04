@@ -17,12 +17,16 @@ public class CharacterRecog{
 	
 	private void init(){
 		Container content = frame.getContentPane();
-		content.setLayout(new GridLayout(1, 3));
+		content.setLayout(new CardLayout());
+		
+		JPanel contentPane = new JPanel();
+		contentPane.setLayout(new GridLayout(1, 4));
+		content.add(contentPane);
 		
 		final DrawPanel drawPad = new DrawPanel();
 		//sets the padDraw in the center		
-		content.add(drawPad, BorderLayout.WEST);
-		content.add(pixelPad, BorderLayout.EAST);
+		contentPane.add(drawPad);
+		contentPane.add(pixelPad);
 		
 		JPanel panel = new JPanel();
 		JPanel text = new JPanel();
@@ -31,7 +35,8 @@ public class CharacterRecog{
 		JLabel cStyle = new JLabel("Label");
 		text.setLayout(new GridLayout(2, 2));
 		//This sets the size of the panel and its segments
-		panel.setLayout(new GridLayout(7,1));
+		//panel.setLayout(new GridLayout(7,1));
+		panel.setLayout(null);
 		panel.setPreferredSize(new Dimension(32, 68));
 		panel.setMinimumSize(new Dimension(32, 68));
 		panel.setMaximumSize(new Dimension(32, 68));
@@ -41,9 +46,22 @@ public class CharacterRecog{
 		 * Create and add JFrame Elements
 		 */
 		final JButton clearButton = new JButton("Clear");
+		final JButton addButton = new JButton("Add Sample");
 		final JButton trainButton = new JButton("Train");
-		clearButton.setBounds(0, 0, 25, 10);
-		trainButton.setBounds(0, 10, 25, 10);
+		
+		//output screen for matches
+		final JTextArea matchScreen = new JTextArea();
+		matchScreen.setPreferredSize(new Dimension(32, 68));
+		matchScreen.setMinimumSize(new Dimension(32, 68));
+		matchScreen.setMaximumSize(new Dimension(32, 68));
+		matchScreen.setEditable(false);
+		
+		JScrollPane matchPane = new JScrollPane(matchScreen, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		final JScrollBar scrollbar = new JScrollBar();
+		matchPane.add(scrollbar);
+		
+		clearButton.setBounds(25, 25, 100, 25);
+		addButton.setBounds(135, 25, 100, 25);
 		final JTextField trainChar = new JTextField();
 		trainChar.setDocument(new TextFieldLimit(1));
 		final JTextField font = new JTextField();
@@ -52,10 +70,14 @@ public class CharacterRecog{
 		text.add(cStyle);
 		text.add(trainChar);
 		text.add(font);
+		text.setBounds(25, 55, 200, 50);
 		panel.add(clearButton);
-		panel.add(trainButton);
+		panel.add(addButton);
 		panel.add(Box.createHorizontalStrut(10));
 		panel.add(text);
+		panel.add(Box.createHorizontalStrut(10));
+		trainButton.setBounds(25, 125, 200, 25);
+		panel.add(trainButton);
 		//END JFrame Components
 		
 		//'Clear' button listener
@@ -74,7 +96,7 @@ public class CharacterRecog{
 		/**
 		 * Disables trainButton until both text fields are filled
 		 */
-		trainButton.setEnabled(false);
+		addButton.setEnabled(false);
 		trainChar.getDocument().addDocumentListener(new DocumentListener(){
 			public void changedUpdate(DocumentEvent e){changed();}
 			@Override
@@ -83,8 +105,8 @@ public class CharacterRecog{
 			public void removeUpdate(DocumentEvent arg0) {changed();}
 			public void changed(){
 				if(trainChar.getText().equals("") || font.getText().equals("")){
-					trainButton.setEnabled(false);
-					}else{ trainButton.setEnabled(true);}
+					addButton.setEnabled(false);
+					}else{ addButton.setEnabled(true);}
 			}
 		});
 		font.getDocument().addDocumentListener(new DocumentListener(){
@@ -95,13 +117,13 @@ public class CharacterRecog{
 			public void removeUpdate(DocumentEvent arg0) {changed();}
 			public void changed(){
 				if(font.getText().equals("") || trainChar.getText().equals("")){ 
-					trainButton.setEnabled(false);
-				}else{trainButton.setEnabled(true);}
+					addButton.setEnabled(false);
+				}else{addButton.setEnabled(true);}
 			}
 		});
 		
 		//'Train' button listener
-		trainButton.addActionListener(new ActionListener(){
+		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				String fChar = trainChar.getText();
 				String charFont = font.getText();
@@ -110,10 +132,10 @@ public class CharacterRecog{
 				drawPad.trainNetwork();
 			}
 		});
+		contentPane.add(matchPane);
+		contentPane.add(panel, BorderLayout.WEST);
 		
-		content.add(panel, BorderLayout.WEST);
-		
-		frame.setSize(800, 300);
+		frame.setSize(1200, 300);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
