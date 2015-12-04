@@ -103,7 +103,7 @@ class DrawPanel extends JComponent{
 	}
 	
 	private void init(){
-		hopfield = new Hopfield(XDIMENSION,YDIMENSION);
+		hopfield = new Hopfield(CharacterRecog.multiplier);
 		drawnCoord = new int[XDIMENSION][YDIMENSION];
 		xxDimension = XDIMENSION *2;
 		yyDimension = YDIMENSION *2;

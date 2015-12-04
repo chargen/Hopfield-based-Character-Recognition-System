@@ -16,13 +16,15 @@ public class CharacterRecog{
 	static JFrame frame = new JFrame("Fuzzy Character Recognition");
 	protected static String fontChar;
 	protected static boolean passed = false;
-	private static int multiplier;
+	protected static int multiplier;
+	private static Hopfield hopfield;
 	
 	public CharacterRecog(int mult){
 		multiplier = mult;
 		
 		pixelPad = new Pixelator(multiplier);
 		drawPad = new DrawPanel(multiplier);
+		hopfield = new Hopfield(multiplier);
 		init();
 	}
 	
@@ -160,6 +162,13 @@ public class CharacterRecog{
 				passed = true;
 				drawPad.addSample();
 			}
+		});
+		
+		trainButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				hopfield.init(drawPad.trainingList, drawPad.drawnCoord, drawPad.sampleChar);
+			}
+			
 		});
 		contentPane.add(matchPane);
 		contentPane.add(panel, BorderLayout.WEST);

@@ -16,9 +16,9 @@ public class Hopfield{
     private int numberPatterns;
     private double THRESHOLD_CONSTANT = 0.0;
 	
-	public Hopfield(int x, int y){
-		XDIMENSION = x;
-		YDIMENSION = y;
+	public Hopfield(int multiplier){
+		XDIMENSION = 7 * multiplier;
+		YDIMENSION = 9 * multiplier;
 	}
 	
 	public void init(ArrayList<int[][]> matricesList, int[][] myEntry, ArrayList<String> labels){
@@ -197,7 +197,7 @@ public class Hopfield{
 		 }
 	 }
 	 
-	//example of usage
+/*	//example of usage
 	public static void main(String[] args){
 			@SuppressWarnings("unused")
 			Hopfield hp = new Hopfield(2,3);
@@ -214,5 +214,5 @@ public class Hopfield{
 			labels.add("B");
 			
 			hp.init(matricesList, myEntry, labels);
-		}
+		}*/
 }
