@@ -18,7 +18,7 @@ public class Pixelator extends JComponent{
 	Image image;
 	Graphics2D graphics2D;
 	int currentX, currentY, oldX, oldY;
-	int[][] coord;
+	protected static volatile int[][] coord;
 	ArrayList<Integer[]> pixCoord = new ArrayList<Integer[]>();
 
 	protected Pixelator(int X, int Y){

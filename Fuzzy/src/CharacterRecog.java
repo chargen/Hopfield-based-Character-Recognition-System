@@ -1,38 +1,43 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 
 public class CharacterRecog{
 	
-	private final static int XDIMENSION = 7;
-	private final static int YDIMENSION = 9;
-	protected static Pixelator pixelPad = new Pixelator(XDIMENSION, YDIMENSION);
+	private static int XDIMENSION = 7;
+	private static int YDIMENSION = 9;
+	protected static Pixelator pixelPad;
+	protected static DrawPanel drawPad;
 	JFrame frame = new JFrame("Fuzzy Character Recognition");
 	protected static String fontChar;
 	protected static boolean passed = false;
+	protected static int multiplier = 1;
 	
 	public CharacterRecog(){
 		init();
 	}
 	
 	private void init(){
+		pixelPad = new Pixelator(XDIMENSION, YDIMENSION);
 		Container content = frame.getContentPane();
 		content.setLayout(new CardLayout());
 		
-		JPanel contentPane = new JPanel();
+		final JPanel contentPane = new JPanel();
 		contentPane.setLayout(new GridLayout(1, 4));
 		content.add(contentPane);
 		
-		final DrawPanel drawPad = new DrawPanel(XDIMENSION, YDIMENSION);
+		drawPad = new DrawPanel(XDIMENSION, YDIMENSION);
 		//sets the padDraw in the center		
 		contentPane.add(drawPad);
 		contentPane.add(pixelPad);
 		
 		final JSlider slider = new JSlider();
-		slider.setMinimum(2);
+		slider.setMinimum(1);
 		slider.setMaximum(8);
 		JPanel panel = new JPanel();
 		JPanel text = new JPanel();
@@ -46,7 +51,7 @@ public class CharacterRecog{
 		panel.setPreferredSize(new Dimension(32, 68));
 		panel.setMinimumSize(new Dimension(32, 68));
 		panel.setMaximumSize(new Dimension(32, 68));
-
+		
 		
 		/**
 		 * Create and add JFrame Elements
@@ -84,6 +89,21 @@ public class CharacterRecog{
 		panel.add(Box.createHorizontalStrut(10));
 		trainButton.setBounds(25, 125, 200, 25);
 		panel.add(trainButton);
+		slider.setBounds(25, 155, 100, 25);
+		panel.add(slider);
+		slider.setValue(1);
+		slider.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				int xDmn = XDIMENSION * slider.getValue();
+				int yDmn = YDIMENSION * slider.getValue();
+				drawPad = new DrawPanel(xDmn, yDmn);
+				pixelPad = new Pixelator(xDmn, yDmn);
+				pixelPad.setCoord(drawPad.drawnCoord);
+				contentPane.repaint();
+				System.out.printf("(%d , %d)", xDmn, yDmn);
+			}			
+		});
 		//END JFrame Components
 		
 		//'Clear' button listener
@@ -128,7 +148,7 @@ public class CharacterRecog{
 			}
 		});
 		
-		//'Train' button listener
+		//'Add Sample' button listener
 		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				String fChar = trainChar.getText();
