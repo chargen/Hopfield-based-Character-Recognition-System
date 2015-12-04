@@ -128,13 +128,24 @@ public class Hopfield{
 	
 	//==================================================== didn't test ===================================================
 	
-	public void activateFunction(){	
+	public void activateFunction(){
+		int value = 100/numberSamples;
 		output = subtractDouble(multiply(weights,entryCoord),thresholds);
+		
+		for(int a=0; a<numberSamples; a++){
+			if(output[a][0]>=0) {
+				output[a][0] = 1;
+			}
+			else{
+				output[a][0] = -1; 
+			}
+		}
 		
 		for(int i=0; i<numberPatterns; i++){
 			for(int j=0; j<numberSamples; j++){
-				if(trainingList.get(i)[j][0] == output[j][0])
-					classificationList[j] += 10;
+				if(trainingList.get(i)[j][0] == output[j][0]){
+					classificationList[i] += value;
+				}
 			}
 		}
 		
