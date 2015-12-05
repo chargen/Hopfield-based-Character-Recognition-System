@@ -7,7 +7,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 
-public class CharacterRecog{
+public class CharacterRecog extends JFrame implements Runnable{
+	
 
 	protected static final int XDIMENSION = 7;
 	protected static final int YDIMENSION = 9;
@@ -24,15 +25,22 @@ public class CharacterRecog{
 	final static JButton trainButton = new JButton("Train");
 	
 	public CharacterRecog(int mult){
-		multiplier = mult;
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setSize(WIDTH, HEIGHT);
+		setResizable(false);
+		setLocationRelativeTo(null);
+		requestFocus(true);
 		
+		multiplier = mult;
+		init();
+		
+	}
+	
+	protected void init(){
 		pixelPad = new Pixelator(multiplier);
 		drawPad = new DrawPanel(multiplier);
 		hopfield = new Hopfield(multiplier);
-		init();
-	}
-	
-	protected static void init(){
+		
 		
 		Container content = frame.getContentPane();
 		content.setLayout(new CardLayout());
@@ -108,14 +116,7 @@ public class CharacterRecog{
 					multiplier = slider.getValue();
 				}
 				
-				try {
-					CharacterRecog.class.newInstance();
-				} catch (InstantiationException | IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				myProgram = new CharacterRecog(multiplier);
+				myProgram.init();
 				drawPad.repaint();
 				pixelPad.repaint();
 
@@ -197,5 +198,10 @@ public class CharacterRecog{
 	
 	public static void main(String[] args){
 		 myProgram = new CharacterRecog(1);
+	}
+
+	@Override
+	public void run() {
+		
 	}
 }
