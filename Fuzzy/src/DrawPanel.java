@@ -20,14 +20,14 @@ class DrawPanel extends JComponent{
 	
 	private static final long serialVersionUID = 1L;
 	Image image;
-	private int RES;
-	private int XDIMENSION, YDIMENSION;
+	private static int RES;
+	protected static int XDIMENSION, YDIMENSION;
 	private int xxDimension;
 	private int yyDimension;
 	Graphics2D graphics2D;
 	protected int currentX, currentY, oldX, oldY;
-	protected static int[][] drawnCoord;
-	protected int[][] gridCoord;//hi-res matrix
+	protected static volatile int drawnCoord[][];
+	protected static int gridCoord[][];//hi-res matrix
 	protected ArrayList<int[][]> trainingList = new ArrayList<int[][]>();
 	protected ArrayList<String> sampleChar = new ArrayList<String>();
 	private int sampleCount = 0;

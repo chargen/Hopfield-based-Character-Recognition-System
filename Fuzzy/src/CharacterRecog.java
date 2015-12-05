@@ -7,8 +7,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 
-public class CharacterRecog extends JFrame implements Runnable{
-	
+public class CharacterRecog{
 
 	protected static final int XDIMENSION = 7;
 	protected static final int YDIMENSION = 9;
@@ -25,22 +24,16 @@ public class CharacterRecog extends JFrame implements Runnable{
 	final static JButton trainButton = new JButton("Train");
 	
 	public CharacterRecog(int mult){
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setSize(WIDTH, HEIGHT);
-		setResizable(false);
-		setLocationRelativeTo(null);
-		requestFocus(true);
-		
 		multiplier = mult;
-		init();
 		
+		
+		init();
 	}
 	
-	protected void init(){
+	protected static void init(){
 		pixelPad = new Pixelator(multiplier);
 		drawPad = new DrawPanel(multiplier);
 		hopfield = new Hopfield(multiplier);
-		
 		
 		Container content = frame.getContentPane();
 		content.setLayout(new CardLayout());
@@ -113,12 +106,11 @@ public class CharacterRecog extends JFrame implements Runnable{
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				if(slider.getValueIsAdjusting()){
+					drawPad.clear();
 					multiplier = slider.getValue();
 				}
+				init();
 				
-				myProgram.init();
-				drawPad.repaint();
-				pixelPad.repaint();
 
 			}			
 		});
@@ -198,10 +190,5 @@ public class CharacterRecog extends JFrame implements Runnable{
 	
 	public static void main(String[] args){
 		 myProgram = new CharacterRecog(1);
-	}
-
-	@Override
-	public void run() {
-		
 	}
 }

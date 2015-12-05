@@ -11,9 +11,9 @@ import javax.swing.JComponent;
 
 public class Pixelator extends JComponent{
 	
-	private static final long serialVersionUID = 1L;
-	private int RES;
-	private int XDIMENSION, YDIMENSION;
+	private static final long serialVersionUID = -6519692501682081558L;
+	private static int RES;
+	private static int XDIMENSION, YDIMENSION;
 	Image image;
 	Graphics2D graphics2D;
 	int currentX, currentY, oldX, oldY;
