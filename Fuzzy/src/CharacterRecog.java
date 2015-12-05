@@ -20,6 +20,8 @@ public class CharacterRecog{
 	protected static volatile boolean train = false;
 	private static Hopfield hopfield;
 	
+	final static JButton trainButton = new JButton("Train");
+	
 	public CharacterRecog(int mult){
 		multiplier = mult;
 		
@@ -63,7 +65,7 @@ public class CharacterRecog{
 		 */
 		final JButton clearButton = new JButton("Clear");
 		final JButton addButton = new JButton("Add Sample");
-		final JButton trainButton = new JButton("Train");
+		
 		
 		//output screen for matches
 		final JTextArea matchScreen = new JTextArea();
@@ -94,6 +96,7 @@ public class CharacterRecog{
 		panel.add(Box.createHorizontalStrut(10));
 		trainButton.setBounds(25, 125, 200, 25);
 		panel.add(trainButton);
+		trainButton.setEnabled(false);
 		slider.setBounds(25, 155, 100, 25);
 		panel.add(slider);
 		slider.setValue(multiplier);
@@ -141,6 +144,7 @@ public class CharacterRecog{
 					}else{ addButton.setEnabled(true);}
 			}
 		});
+		
 		font.getDocument().addDocumentListener(new DocumentListener(){
 			public void changedUpdate(DocumentEvent e){changed();}
 			@Override
@@ -162,6 +166,7 @@ public class CharacterRecog{
 				drawPad.setSampleChar(fChar +"-"+ charFont);
 				passed = true;
 				drawPad.addSample();
+				trainButton.setEnabled(true);
 			}
 		});
 		
@@ -169,6 +174,7 @@ public class CharacterRecog{
 			public void actionPerformed(ActionEvent arg0) {
 				drawPad.clear();
 				train = true;
+				trainButton.setEnabled(false);
 			}
 			
 		});
