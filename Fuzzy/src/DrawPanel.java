@@ -98,6 +98,10 @@ class DrawPanel extends JComponent{
 					}
 					error.printStackTrace();
 				}
+				if(CharacterRecog.train){
+					hopfield.init(trainingList, drawnCoord, sampleChar);
+					CharacterRecog.train = false;
+				}
 			}
 		});
 	}

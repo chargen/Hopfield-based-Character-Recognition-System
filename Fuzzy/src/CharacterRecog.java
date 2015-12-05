@@ -17,6 +17,7 @@ public class CharacterRecog{
 	protected static String fontChar;
 	protected static boolean passed = false;
 	protected static int multiplier;
+	protected static volatile boolean train = false;
 	private static Hopfield hopfield;
 	
 	public CharacterRecog(int mult){
@@ -166,7 +167,8 @@ public class CharacterRecog{
 		
 		trainButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				hopfield.init(drawPad.trainingList, drawPad.drawnCoord, drawPad.sampleChar);
+				drawPad.clear();
+				train = true;
 			}
 			
 		});
