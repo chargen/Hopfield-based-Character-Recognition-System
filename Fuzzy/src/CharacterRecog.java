@@ -19,6 +19,7 @@ public class CharacterRecog{
 	protected static int multiplier;
 	protected static volatile boolean train = false;
 	private static Hopfield hopfield;
+	static CharacterRecog myProgram;
 	
 	final static JButton trainButton = new JButton("Train");
 	
@@ -106,9 +107,17 @@ public class CharacterRecog{
 				if(slider.getValueIsAdjusting()){
 					multiplier = slider.getValue();
 				}
-				drawPad = new DrawPanel(multiplier);
-				pixelPad = new Pixelator(multiplier);
-				new CharacterRecog(multiplier);
+				
+				try {
+					CharacterRecog.class.newInstance();
+				} catch (InstantiationException | IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				myProgram = new CharacterRecog(multiplier);
+				drawPad.repaint();
+				pixelPad.repaint();
 
 			}			
 		});
@@ -187,7 +196,6 @@ public class CharacterRecog{
 	}
 	
 	public static void main(String[] args){
-		@SuppressWarnings("unused")
-		CharacterRecog myProgram = new CharacterRecog(4);
+		 myProgram = new CharacterRecog(1);
 	}
 }
