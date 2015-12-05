@@ -106,9 +106,8 @@ public class CharacterRecog{
 				if(slider.getValueIsAdjusting()){
 					multiplier = slider.getValue();
 				}
-				//drawPad.drawnCoord = new int[XDIMENSION * multiplier][YDIMENSION * multiplier];
-				//drawPad = new DrawPanel(multiplier);
-				//pixelPad = new Pixelator(multiplier);
+				drawPad = new DrawPanel(multiplier);
+				pixelPad = new Pixelator(multiplier);
 				new CharacterRecog(multiplier);
 
 			}			
@@ -189,6 +188,6 @@ public class CharacterRecog{
 	
 	public static void main(String[] args){
 		@SuppressWarnings("unused")
-		CharacterRecog myProgram = new CharacterRecog(1);
+		CharacterRecog myProgram = new CharacterRecog(4);
 	}
 }

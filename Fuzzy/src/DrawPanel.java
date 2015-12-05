@@ -44,7 +44,7 @@ class DrawPanel extends JComponent{
 
 		init();
 		
-		setDoubleBuffered(false);
+		setDoubleBuffered(true);
 		
 		//if the mouse is pressed it sets the oldX & oldY
 		//coordinates as the mouses x & y coordinates
@@ -261,9 +261,5 @@ class DrawPanel extends JComponent{
 			sampleChar.add(sampleCount, tChar);
 		}
 	}
-	
-/*	private void hopfieldLearning(){
-		hopfield.init(trainingList,gridCoord,sampleChar);
-	}*/
 	
 }
