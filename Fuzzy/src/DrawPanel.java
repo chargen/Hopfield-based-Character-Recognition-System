@@ -37,7 +37,7 @@ class DrawPanel extends JComponent{
 	private Hopfield hopfield;
 	//set debug mode by adjusting this value.
 	//OFF-0, MATRIX-1, PIXELS-2, MATRIX_AND_PIXELS-3
-	int debug = 4;
+	int debug = 1;
 
 	public DrawPanel(int multiplier){
 		XDIMENSION = 7 * multiplier;
@@ -104,6 +104,7 @@ class DrawPanel extends JComponent{
 				if(CharacterRecog.train){
 					hopfield.init(trainingList, drawnCoord, sampleChar);
 					CharacterRecog.train = false;
+					
 				}
 			}
 		});
@@ -111,7 +112,7 @@ class DrawPanel extends JComponent{
 	
 	private void init(){
 		hopfield = new Hopfield(CharacterRecog.multiplier);
-		drawnCoord = new double[XDIMENSION][YDIMENSION];
+		drawnCoord = new double[YDIMENSION][XDIMENSION];
 		xxDimension = XDIMENSION *2;
 		yyDimension = YDIMENSION *2;
 		gridCoord = new double[xxDimension][yyDimension];
@@ -143,10 +144,10 @@ class DrawPanel extends JComponent{
 		}finally{//set brush color, generate new pixel array;
 			graphics2D.setPaint(Color.red);
 
-			drawnCoord = new double[XDIMENSION][YDIMENSION];
+			drawnCoord = new double[YDIMENSION][XDIMENSION];
 			for(int i = 0; i < YDIMENSION; i++)
 				for(int j = 0; j < XDIMENSION; j++)
-					drawnCoord[j][i] = -1;
+					drawnCoord[i][j] = -1;
 			gridCoord = new double[xxDimension][yyDimension];
 			
 			repaint();
@@ -199,15 +200,15 @@ class DrawPanel extends JComponent{
 				}
 				
 				switch(total){
-				case 0: drawnCoord[x][y] = -1;
+				case 0: drawnCoord[y][x] = -1;
 				break;
-				case 1: drawnCoord[x][y] = -1;
+				case 1: drawnCoord[y][x] = -1;
 				break;
-				case 2: drawnCoord[x][y] = 1;
+				case 2: drawnCoord[y][x] = 1;
 				break;
-				case 3: drawnCoord[x][y] = 1;
+				case 3: drawnCoord[y][x] = 1;
 				break;
-				default: drawnCoord[x][y] = 1;
+				default: drawnCoord[y][x] = 1;
 				break;
 				}
 			}
@@ -228,10 +229,10 @@ class DrawPanel extends JComponent{
 	private void printSample(int i){
 		for(int y = 0; y < YDIMENSION; y++){
 			for(int x = 0; x < XDIMENSION; x++){
-				if(trainingList.get(i)[x][y] >= 0){
+				if(trainingList.get(i)[y][x] >= 0){
 					System.out.print(" ");
 				}
-				System.out.print((int) trainingList.get(i)[x][y]);
+				System.out.print((int) trainingList.get(i)[y][x]);
 			}
 			System.out.println();
 		}
@@ -250,10 +251,10 @@ class DrawPanel extends JComponent{
 	private void printDrawnArray(){
 		for(int y = 0; y < YDIMENSION; y++){
 			for(int x = 0; x < XDIMENSION; x++){
-				if(drawnCoord[x][y] >= 0){
+				if(drawnCoord[y][x] >= 0){
 					System.out.print(" ");
 				}
-				System.out.print((int) drawnCoord[x][y]);
+				System.out.print((int) drawnCoord[y][x]);
 			}
 			System.out.println();
 		}
@@ -263,7 +264,7 @@ class DrawPanel extends JComponent{
 	//add new matrix to the arrayList
 	protected void setSampleChar(String tChar){
 		if(!CharacterRecog.passed){
-			sampleChar.add(sampleCount, tChar);
+			sampleChar.add(tChar);
 		}
 	}
 	

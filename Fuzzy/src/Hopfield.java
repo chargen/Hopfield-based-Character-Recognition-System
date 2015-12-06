@@ -61,9 +61,6 @@ public class Hopfield{
 			inputXtransp = sum((multiply(trainingList.get(i), matrixT)),inputXtransp);				//sum of multiplied matrices
 		}
 		weights = subtract(inputXtransp,identityXpattern());
-		CharacterRecog.pixelPad.setCoord(activateFunction());
-		CharacterRecog.pixelPad.pixelate();
-		
 		sort();
 	}
 		
@@ -170,10 +167,10 @@ public class Hopfield{
 
 	public double[][] makeGrid(double[][] myEntry){
 		double[][] grid = new double[XDIMENSION][YDIMENSION];
-		int i,j,k=0;
-		for(i=0;i<YDIMENSION;i++){
-			for(j=0;j<XDIMENSION;j++){
-				grid[j][i]=(int)myEntry[k][0];
+		int y,x,k=0;
+		for(y=0;y<YDIMENSION;y++){
+			for(x=0;x<XDIMENSION;x++){
+				grid[y][x]=(int)myEntry[k][0];
 				k++;
 			}
 		}
@@ -186,9 +183,9 @@ public class Hopfield{
 		 
 		 for(int i=0;i<matricesList.size();i++){
 			 double[][] aux = new double[XDIMENSION*YDIMENSION][1];
-			 for(int j=0;j<YDIMENSION;j++){
-				 for(int k=0;k<XDIMENSION;k++){				 
-					 aux[l++][0] = matricesList.get(i)[k][j];
+			 for(int y=0;y<YDIMENSION;y++){
+				 for(int x=0;x<XDIMENSION;x++){				 
+					 aux[l++][0] = matricesList.get(i)[y][x];
 				 }
 			 }			 
 			 trainingChar.add(labels.get(i));	 
@@ -196,9 +193,9 @@ public class Hopfield{
 			 l=0;	 		 
 		 }
 		 
-		 for(int j=0;j<YDIMENSION;j++){
-			 for(int k=0;k<XDIMENSION;k++){
-				 entryCoord[l++][0] = myEntry[k][j];
+		 for(int y=0;y<YDIMENSION;y++){
+			 for(int x=0;x<XDIMENSION;x++){
+				 entryCoord[l++][0] = myEntry[y][x];
 			 }
 		 }
 	 }

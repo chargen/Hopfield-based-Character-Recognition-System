@@ -61,9 +61,9 @@ public class Pixelator extends JComponent{
 	 * adds only pixel locations to 'pixCoord' ArrayList
 	 */
 	protected void pixelate(){
-		for(int x = 0; x < XDIMENSION; x++){
-			for(int y = 0; y < YDIMENSION; y++){
-				if(coord[x][y] >= 0){
+		for(int y = 0; y < YDIMENSION; y++){
+			for(int x = 0; x < XDIMENSION; x++){
+				if(coord[y][x] >= 0){
 					Integer[] pixXY = {(x*RES),(y*RES)};
 					pixCoord.add(pixXY);
 				}
