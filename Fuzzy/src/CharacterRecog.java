@@ -11,6 +11,8 @@ public class CharacterRecog{
 
 	protected static final int XDIMENSION = 7;
 	protected static final int YDIMENSION = 9;
+	protected static final int WIDTH = 1200;
+	protected static final int HEIGHT = 300;
 	protected static Pixelator pixelPad;
 	protected static DrawPanel drawPad;
 	static JFrame frame = new JFrame("Fuzzy Character Recognition");
@@ -40,6 +42,7 @@ public class CharacterRecog{
 		
 		final JPanel contentPane = new JPanel();
 		contentPane.setLayout(new GridLayout(1, 4));
+		contentPane.setBackground(Color.DARK_GRAY);
 		content.add(contentPane);
 			
 		contentPane.add(drawPad);
@@ -110,7 +113,6 @@ public class CharacterRecog{
 					multiplier = slider.getValue();
 				}
 				init();
-				
 
 			}			
 		});

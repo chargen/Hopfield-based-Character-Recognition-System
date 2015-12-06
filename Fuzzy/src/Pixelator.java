@@ -12,12 +12,14 @@ import javax.swing.JComponent;
 public class Pixelator extends JComponent{
 	
 	private static final long serialVersionUID = -6519692501682081558L;
+	protected static final int WIDTH = 196;
+	protected static final int HEIGHT = 252;
 	private static int RES;
 	private static int XDIMENSION, YDIMENSION;
 	Image image;
 	Graphics2D graphics2D;
 	int currentX, currentY, oldX, oldY;
-	protected int[][] coord;
+	protected double[][] coord;
 	ArrayList<Integer[]> pixCoord = new ArrayList<Integer[]>();
 
 	protected Pixelator(int multiplier){
@@ -31,7 +33,7 @@ public class Pixelator extends JComponent{
 	//Initialize JComponent
 	protected void paintComponent(Graphics g){
 		if(image == null){
-			image = createImage(XDIMENSION * RES, YDIMENSION * RES);
+			image = createImage(WIDTH, HEIGHT);
 			graphics2D = (Graphics2D)image.getGraphics();
 			graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			clear();
@@ -43,14 +45,14 @@ public class Pixelator extends JComponent{
 	//resets pixelCoord values, restores JComponent window to default
 	protected void clear(){
 		graphics2D.setPaint(Color.white);
-		graphics2D.fillRect(0, 0, XDIMENSION * RES, YDIMENSION * RES);
+		graphics2D.fillRect(0, 0, WIDTH, HEIGHT);
 		graphics2D.setPaint(Color.red);
 		pixCoord.clear();
 		repaint();
 	}
 	
 	//get coordinates to be pixelated
-	protected void setCoord(int[][] val){
+	protected void setCoord(double[][] val){
 		coord = val;
 	}
 	

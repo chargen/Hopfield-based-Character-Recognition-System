@@ -1,17 +1,24 @@
 import java.util.ArrayList;
 import java.io.IOException;
 
+import Jama.Matrix;
+
 public class Hopfield{
-	private ArrayList<int[][]> trainingList;														//list of data
+	private ArrayList<double[][]> trainingList;														//list of data
 	private ArrayList<String> trainingChar;															//list of labels
 	private int XDIMENSION, YDIMENSION;																//dimensions
-	private int[][] entryCoord;																		//input matrix
-	private int[] classificationList;																//percentage of classification for each entry  
+	private double[][] entryCoord;																		//input matrix
+	private int[] classificationList;	
+	//percentage of classification for each entry  
+	
+	QuickSort<int[]> newSort = new QuickSort<int[]>();
+	
+	protected int[] matchList = null;
+	protected int[] posList = null;
 	
 	//set values needed for calculation
-	private int[][] weights;																		//matrix of weights
+	private double[][] weights;																		//matrix of weights
     private double[][] thresholds;																		//used to determine thresholds
-    private double[][] output;																			//output vector
     private int numberSamples = 0;
     private int numberPatterns;
     private double THRESHOLD_CONSTANT = 0.0;
@@ -21,21 +28,20 @@ public class Hopfield{
 		YDIMENSION = 9 * multiplier;
 	}
 	
-	public void init(ArrayList<int[][]> matricesList, int[][] myEntry, ArrayList<String> labels){
+	public void init(ArrayList<double[][]> matricesList, double[][] myEntry, ArrayList<String> labels){
 		numberSamples = XDIMENSION*YDIMENSION;														//set the number of neurons		
 		numberPatterns = matricesList.size();
 		
 		classificationList = new int[numberPatterns];
-		weights = new int[numberSamples][numberSamples];											//create the weights matrix        
-        output = new double[numberSamples][1];															//create the output matrix        
+		weights = new double[numberSamples][numberSamples];											//create the weights matrix        
         thresholds = new double[numberSamples][1];														//create the offset Neuron weights (used to determine thresholds)
         for(int i=0; i<numberSamples; i++){
         	thresholds[i][0] = THRESHOLD_CONSTANT;
         }
         //inputs
-		entryCoord = new int[XDIMENSION*YDIMENSION][1];	
+		entryCoord = new double[XDIMENSION*YDIMENSION][1];	
 		trainingChar = new ArrayList<String>();
-		trainingList = new ArrayList<int[][]>();
+		trainingList = new ArrayList<double[][]>();
 		
 		makeInput(matricesList, myEntry, labels);													//takes the inputs and transforms them into arrays.
 		
@@ -43,14 +49,14 @@ public class Hopfield{
 	}
 	
 	public void calculate(){
-		int[][] inputXtransp = new int[numberSamples][numberSamples];								//input multiplied by its transposed
+		double[][] inputXtransp = new double[numberSamples][numberSamples];								//input multiplied by its transposed
 		for(int i=0; i<trainingList.size(); i++){
-			int[][] matrixT = new int[1][numberSamples];											//transposed of a matrix
+			double[][] matrixT = new double[1][numberSamples];											//transposed of a matrix
 			
 			matrixT = transpose(trainingList.get(i));												//create the transposed matrices
 			inputXtransp = sum((multiply(trainingList.get(i), matrixT)),inputXtransp);				//sum of multiplied matrices
 		}
-		weights = subtractInt(inputXtransp,identityXpattern());
+		weights = subtract(inputXtransp,identityXpattern());
 		activateFunction();
 		
 		/*for(int a=0; a<numberSamples; a++){
@@ -63,123 +69,87 @@ public class Hopfield{
 		
 	
 	//transpose the input matrix
-	public int[][] transpose(int[][] matrix){
-		int[][] A = new int[1][numberSamples];
-		for (int col=0; col<numberSamples; col++)
-            	A[0][col] = matrix[col][0];
-		
-		return A;
+	public double[][] transpose(double[][] matrix){
+		Matrix A = new Matrix(matrix).transpose();
+		return A.getArray();
 	}
 	 
 	//multiply 2 matrices
-	public int[][] multiply(int[][] matrix1, int[][] matrix2){	       
-		if (matrix1[0].length != matrix2.length){
-			throw new IllegalArgumentException("matrix1: columns " + matrix1[0].length + " did not match matrix2:Rows " + matrix2.length + ".");
-            
-		}
-		int[][] C = new int[matrix1.length][matrix2[0].length];
-        for (int i = 0; i < C.length; i++){
-            for (int j = 0; j < C[0].length; j++)
-         	   for(int k=0; k<matrix1[0].length;k++)
-                 	C[i][j] += matrix1[i][k] * matrix2[k][j];            	
-       }
-       return C;
+	public double[][] multiply(double[][] matrix1, double[][] matrix2){	       
+		Matrix C = new Matrix(matrix1).times(new Matrix(matrix2));
+		return C.getArray();
 	}
-	/*public int[][] multiply(int[][] matrix1, int[][] matrix2){		
-		int[][] C = new int[numberSamples][numberSamples];
-       for (int i = 0; i < numberSamples; i++){
-           for (int j = 0; j < numberSamples; j++)
-           	C[i][j] = matrix1[i][0] * matrix2[0][j];            	
-       }
-       return C;
-	}*/
-		
-	public int[][] sum(int[][] matrix1, int[][] matrix2) {
-	       int[][] A = new int[numberSamples][numberSamples];
-	       for (int i=0; i<numberSamples; i++)
-	           for (int j=0; j<numberSamples; j++)
-	               A[i][j] = matrix1[i][j] + matrix2[i][j];
-	       return A;
+
+	//sum 2 matrices
+	public double [][] sum(double[][] matrix1, double[][] matrix2) {	
+		Matrix C = new Matrix(matrix1).plus(new Matrix(matrix2));
+		return C.getArray();
 	}
 	
-	public double[][] subtractDouble(int[][] matrix1, double[][] matrix2){
-        double[][] A = new double[matrix1.length][matrix1[0].length];
-        for (int i = 0; i < matrix1.length; i++)
-            for (int j = 0; j < matrix1[0].length; j++)
-                A[i][j] = matrix1[i][j] - matrix2[i][j];
-        return A;
-	}
+	//subtract 2 matrices
+	public double[][] subtract(double[][] matrix1, double[][] matrix2){  
+        Matrix C = new Matrix(matrix1).minus(new Matrix(matrix2));
+		return C.getArray();
+	}	
 	
-	public int[][] subtractInt(int[][] matrix1, int[][] matrix2){
-        int[][] A = new int[matrix1.length][matrix1[0].length];
-        for (int i = 0; i < matrix1.length; i++)
-            for (int j = 0; j < matrix1[0].length; j++)
-                A[i][j] = matrix1[i][j] - matrix2[i][j];
-        return A;
-	}
-	
-	public int[][] identityXpattern(){
-		int[][] A = new int[numberSamples][numberSamples];
+	public double[][] identityXpattern(){
+		double[][] A = new double[numberSamples][numberSamples];
 		for (int i=0; i<numberSamples; i++) {
             	A[i][i] = numberPatterns;
         }
 		return A;
     }
 	
+	public double[][] sign(double[][] output){
+		for (int i=0; i<numberSamples; i++) {
+			if (output[i][0]>=0)
+				output[i][0]=1;
+		    else
+		    	output[i][0]=-1;
+        }
+		return output;
+    }
+	
 	//==================================================== didn't test ===================================================
 	
 	public void activateFunction(){
-		int value = 100/numberSamples;
-		output = subtractDouble(multiply(weights,entryCoord),thresholds);
-		
-		for(int a=0; a<numberSamples; a++){
-			if(output[a][0]>=0) {
-				output[a][0] = 1;
-			}
-			else{
-				output[a][0] = -1; 
-			}
-		}
-		
-		for(int i=0; i<numberPatterns; i++){
-			for(int j=0; j<numberSamples; j++){
-				if(trainingList.get(i)[j][0] == output[j][0]){
-					classificationList[i] += value;
+	
+		boolean run = true;
+		int count = 0, inc = 0;
+		while(run){
+			double[][] output = sign(subtract(multiply(weights, entryCoord), thresholds));
+			
+			for(int i = 0; i < trainingList.size(); i++){
+				for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
+					double tLval = trainingList.get(i)[j][0];
+					if(tLval == output[j][0]){
+						count++;
+					}
 				}
-			}
+				matchList[i] = count;
+				posList[i] = i;
+				
+				
+				if(count == output.length)
+					run = false;
+			}	
 		}
+		newSort.setSortArray(posList, matchList);	
+		int[] returnArray = newSort.sortArray(0, posList.length);
 		
 		
-		for(int s=0; s<classificationList.length; s++){
-				System.out.println(classificationList[s]);
-		}
-		
-		System.out.println("-----------------");
-		for(int a=0; a<numberSamples; a++){
-			for(int b=0; b<numberSamples; b++){
-				System.out.print(weights[a][b]);
-			}
-			System.out.println();
-		}
-		System.out.println("-----------------");
-		
-		for(int a=0; a<numberSamples; a++){			
-			System.out.println(entryCoord[a][0]);
-		}
-		
-		System.out.println("-----------------");
-		for(int a=0; a<numberSamples; a++)
-			System.out.println(output[a][0]);
-		//System.out.println();
 		
 	}
-	 
+		
+		
+	
+	
 	 //takes the inputs and transforms them into arrays.
-	 public void makeInput(ArrayList<int[][]> matricesList, int[][] myEntry, ArrayList<String> labels){
+	 public void makeInput(ArrayList<double[][]> matricesList, double[][] myEntry, ArrayList<String> labels){
 		 int i,j,k,l=0;		 
 		 
 		 for(i=0;i<matricesList.size();i++){
-			 int[][] aux = new int[XDIMENSION*YDIMENSION][1];
+			 double[][] aux = new double[XDIMENSION*YDIMENSION][1];
 			 for(j=0;j<YDIMENSION;j++){
 				 for(k=0;k<XDIMENSION;k++){				 
 					 aux[l++][0] = matricesList.get(i)[j][k];
@@ -197,16 +167,16 @@ public class Hopfield{
 		 }
 	 }
 	 
-/*	//example of usage
+	//example of usage
 	public static void main(String[] args){
 			@SuppressWarnings("unused")
-			Hopfield hp = new Hopfield(2,3);
-			ArrayList<int[][]> matricesList = new ArrayList<int[][]>(2);
+			Hopfield hp = new Hopfield(CharacterRecog.multiplier);
+			ArrayList<double[][]> matricesList = new ArrayList<double[][]>(2);
 			ArrayList<String> labels = new ArrayList<String>(2);
-			int[][] matrix1 = {{1,1},{1,1},{1,1}};
+			double[][] matrix1 = {{1,1},{1,1},{1,1}};
 			//int[][] matrix1 = {{2,1},{4,1},{6,1}};
-			int[][] matrix2 = {{-1,-1},{-1,-1},{-1,-1}};
-			int[][] myEntry = {{-1,-1},{-1,-1},{-1,1}};
+			double[][] matrix2 = {{-1,-1},{-1,-1},{-1,-1}};
+			double[][] myEntry = {{-1,-1},{-1,-1},{-1,1}};
 			
 			matricesList.add(matrix1);
 			labels.add("A");
@@ -214,5 +184,5 @@ public class Hopfield{
 			labels.add("B");
 			
 			hp.init(matricesList, myEntry, labels);
-		}*/
+		}
 }

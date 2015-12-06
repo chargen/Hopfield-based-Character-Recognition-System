@@ -22,13 +22,16 @@ class DrawPanel extends JComponent{
 	Image image;
 	private static int RES;
 	protected static int XDIMENSION, YDIMENSION;
+
+	protected static final int WIDTH = 196;
+	protected static final int HEIGHT = 252;
 	private int xxDimension;
 	private int yyDimension;
 	Graphics2D graphics2D;
 	protected int currentX, currentY, oldX, oldY;
-	protected static volatile int drawnCoord[][];
-	protected static int gridCoord[][];//hi-res matrix
-	protected ArrayList<int[][]> trainingList = new ArrayList<int[][]>();
+	protected static volatile double drawnCoord[][];
+	protected static double gridCoord[][];//hi-res matrix
+	protected ArrayList<double[][]> trainingList = new ArrayList<double[][]>();
 	protected ArrayList<String> sampleChar = new ArrayList<String>();
 	private int sampleCount = 0;
 	private Hopfield hopfield;
@@ -108,10 +111,10 @@ class DrawPanel extends JComponent{
 	
 	private void init(){
 		hopfield = new Hopfield(CharacterRecog.multiplier);
-		drawnCoord = new int[XDIMENSION][YDIMENSION];
+		drawnCoord = new double[XDIMENSION][YDIMENSION];
 		xxDimension = XDIMENSION *2;
 		yyDimension = YDIMENSION *2;
-		gridCoord = new int[xxDimension][yyDimension];
+		gridCoord = new double[xxDimension][yyDimension];
 	}
 	
 	//initializes the JComponent drawing screens
@@ -134,15 +137,17 @@ class DrawPanel extends JComponent{
 			graphics2D = (Graphics2D)image.getGraphics();
 		}catch(IOException e){//if image file cannot load set blank default
 			System.err.println("image: \'grid.gif\' not found");
-			image = createImage(XDIMENSION * RES, YDIMENSION * RES);
+			image = createImage(WIDTH, HEIGHT);
 			graphics2D.setPaint(Color.white);
-			graphics2D.fillRect(0, 0, XDIMENSION * RES, YDIMENSION * RES);
+			graphics2D.fillRect(0, 0, WIDTH, HEIGHT);
 		}finally{//set brush color, generate new pixel array;
 			graphics2D.setPaint(Color.red);
+
+			drawnCoord = new double[XDIMENSION][YDIMENSION];
 			for(int i = 0; i < YDIMENSION; i++)
 				for(int j = 0; j < XDIMENSION; j++)
 					drawnCoord[j][i] = -1;
-			gridCoord = new int[xxDimension][yyDimension];
+			gridCoord = new double[xxDimension][yyDimension];
 			
 			repaint();
 			CharacterRecog.pixelPad.clear();
@@ -226,7 +231,7 @@ class DrawPanel extends JComponent{
 				if(trainingList.get(i)[x][y] >= 0){
 					System.out.print(" ");
 				}
-				System.out.print(trainingList.get(i)[x][y]);
+				System.out.print((int) trainingList.get(i)[x][y]);
 			}
 			System.out.println();
 		}
@@ -235,7 +240,7 @@ class DrawPanel extends JComponent{
 	private void printCoord(){
 		for(int y = 0; y < yyDimension; y++){
 			for(int x = 0; x < xxDimension; x++){
-				System.out.print(gridCoord[x][y]);
+				System.out.print((int)gridCoord[x][y]);
 			}
 			System.out.println();
 		}
@@ -248,7 +253,7 @@ class DrawPanel extends JComponent{
 				if(drawnCoord[x][y] >= 0){
 					System.out.print(" ");
 				}
-				System.out.print(drawnCoord[x][y]);
+				System.out.print((int) drawnCoord[x][y]);
 			}
 			System.out.println();
 		}
