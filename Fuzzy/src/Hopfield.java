@@ -3,12 +3,13 @@ import java.io.IOException;
 
 import Jama.Matrix;
 
-public class Hopfield{
+public class Hopfield implements Runnable{
 	private ArrayList<double[][]> trainingList;														//list of data
 	private ArrayList<String> trainingChar;															//list of labels
 	private int XDIMENSION, YDIMENSION;																//dimensions
 	private double[][] entryCoord;																		//input matrix
 	private int[] classificationList;	
+	protected int matchingPixels = 0;
 	//percentage of classification for each entry  
 	
 	QuickSort<int[]> newSort = new QuickSort<int[]>();
@@ -22,13 +23,19 @@ public class Hopfield{
     private int numberSamples = 0;
     private int numberPatterns;
     private double THRESHOLD_CONSTANT = 0.0;
+    
+    Thread hopThread;
 	
 	public Hopfield(int multiplier){
+		hopThread = new Thread(this);
+		hopThread.start();
 		XDIMENSION = 7 * multiplier;
 		YDIMENSION = 9 * multiplier;
 	}
     
     public Hopfield(int x, int y){
+		hopThread = new Thread(this);
+		hopThread.start();
     	XDIMENSION = x;
     	YDIMENSION = y;
     }
@@ -48,8 +55,8 @@ public class Hopfield{
 		trainingChar = new ArrayList<String>();
 		trainingList = new ArrayList<double[][]>();
 		makeInput(matricesList, myEntry, labels);													//takes the inputs and transforms them into arrays.
-		
-		calculate();																				//start calculating
+
+		calculate();
 	}
 	
 	public void calculate(){
@@ -61,7 +68,7 @@ public class Hopfield{
 			inputXtransp = sum((multiply(trainingList.get(i), matrixT)),inputXtransp);				//sum of multiplied matrices
 		}
 		weights = subtract(inputXtransp,identityXpattern());
-		sort();
+		//CharacterRecog.pixelPad.setCoord(activateFunction());
 	}
 		
 	
@@ -120,20 +127,23 @@ public class Hopfield{
 					for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
 						if(trainingList.get(i)[j][0] == output[j][0]){
 							count++;
+							if(output[j][0] == 1)
+								matchingPixels++;
 						}
 						if(count == (XDIMENSION * YDIMENSION)){
 							run = false;
 							for(int k = 0; k < output.length; k++){
-								System.out.print(output[k][0] + " ");
+								//System.out.print(output[k][0] + " ");
 								
 							}
 								
 						}
 					}
 					count = 0;
-				}	
+				}
 	
 		}
+		
 		return makeGrid(output);
 	}
 		
@@ -144,7 +154,7 @@ public class Hopfield{
 		int count = 0;
 		for(int i = 0; i < trainingList.size(); i++){
 			for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
-				if(trainingList.get(i)[j][0] == entryCoord[j][0]){
+				if(trainingList.get(i)[j][0] == entryCoord[j][0] && entryCoord[j][0] == 1){
 					count++;
 				}
 			}
@@ -157,16 +167,20 @@ public class Hopfield{
 		int size = returnArray.length - 1;
 		int[] countArray = newSort.getRankArray();
 		
-		for(int i = size; i >= 0; i--){
-			System.out.print("\n"+ trainingChar.get(returnArray[i]) + "-" +
-					((double)(countArray[i])/(XDIMENSION * YDIMENSION))*100 + "%\n");
+		CharacterRecog.matchScreen.setText("\t"+ trainingChar.get(returnArray[size]) + "-" +
+				((double)(countArray[size])/matchingPixels)*100 + "%\n");
+		for(int i = size - 1; i >= 0; i--){
+		
+			CharacterRecog.matchScreen.append("\t"+ trainingChar.get(returnArray[i]) + "-" +
+					((double)(countArray[i])/matchingPixels)*100 + "%\n");
 		}
+		matchingPixels = 0;
 	}
 	
 	
 
 	public double[][] makeGrid(double[][] myEntry){
-		double[][] grid = new double[XDIMENSION][YDIMENSION];
+		double[][] grid = new double[YDIMENSION][XDIMENSION];
 		int y,x,k=0;
 		for(y=0;y<YDIMENSION;y++){
 			for(x=0;x<XDIMENSION;x++){
@@ -199,6 +213,12 @@ public class Hopfield{
 			 }
 		 }
 	 }
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
 	 
 /*	//example of usage
 	public static void main(String[] args){

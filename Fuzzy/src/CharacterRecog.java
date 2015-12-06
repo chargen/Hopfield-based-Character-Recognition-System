@@ -18,7 +18,6 @@ public class CharacterRecog{
 	static JFrame frame = new JFrame("Fuzzy Character Recognition");
 	static JTextArea matchScreen;
 	protected static String fontChar;
-	protected static boolean passed = false;
 	protected static int multiplier;
 	protected static volatile boolean train = false;
 	private static Hopfield hopfield;
@@ -61,7 +60,6 @@ public class CharacterRecog{
 		//This sets the size of the panel and its segments
 		//panel.setLayout(new GridLayout(7,1));
 		panel.setLayout(null);
-		panel.setBackground(Color.DARK_GRAY);
 		panel.setPreferredSize(new Dimension(32, 68));
 		panel.setMinimumSize(new Dimension(32, 68));
 		panel.setMaximumSize(new Dimension(32, 68));
@@ -72,6 +70,7 @@ public class CharacterRecog{
 		 */
 		final JButton clearButton = new JButton("Clear");
 		final JButton addButton = new JButton("Add Sample");
+		final JButton testButton = new JButton("Test");
 		
 		
 		//output screen for matches
@@ -118,6 +117,25 @@ public class CharacterRecog{
 
 			}			
 		});
+		testButton.setBounds(130, 155, 100, 25);
+		panel.add(testButton);
+		testButton.setEnabled(false);
+		testButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(train){
+					train = false;
+					testButton.setText("Test");
+					trainButton.setEnabled(true);
+				}else{
+					train = true;
+					testButton.setText("Testing...");
+					trainButton.setEnabled(false);
+				}
+			}
+			
+		});
 		//END JFrame Components
 		
 		//'Clear' button listener
@@ -126,10 +144,10 @@ public class CharacterRecog{
 				pixelPad.setCoord(drawPad.drawnCoord);
 				pixelPad.drawImage();
 				drawPad.clear();
-				passed = false;
 				fontChar = null;
 				font.setText("");
 				sampleChar.setText("");
+				matchScreen.setText("");
 			}
 		});
 		
@@ -169,17 +187,19 @@ public class CharacterRecog{
 				String fChar = sampleChar.getText();
 				String charFont = font.getText();
 				drawPad.setSampleChar(fChar +"-"+ charFont);
-				passed = true;
 				drawPad.addSample();
+				drawPad.clear();
+				font.setText("");
+				sampleChar.setText("");
 				trainButton.setEnabled(true);
+				
 			}
 		});
 		
 		trainButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				drawPad.clear();
-				train = true;
-				trainButton.setEnabled(false);
+				testButton.setEnabled(true);
 			}
 			
 		});

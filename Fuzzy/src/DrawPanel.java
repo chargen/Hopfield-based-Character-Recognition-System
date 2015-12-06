@@ -33,11 +33,11 @@ class DrawPanel extends JComponent{
 	protected static double gridCoord[][];//hi-res matrix
 	protected ArrayList<double[][]> trainingList = new ArrayList<double[][]>();
 	protected ArrayList<String> sampleChar = new ArrayList<String>();
-	private int sampleCount = 0;
+	private static int sampleCount = 0;
 	private Hopfield hopfield;
 	//set debug mode by adjusting this value.
 	//OFF-0, MATRIX-1, PIXELS-2, MATRIX_AND_PIXELS-3
-	int debug = 1;
+	int debug = 0;
 
 	public DrawPanel(int multiplier){
 		XDIMENSION = 7 * multiplier;
@@ -83,31 +83,43 @@ class DrawPanel extends JComponent{
 		//when mouse is released, pixel values are generated and drawn
 		addMouseListener(new MouseAdapter(){
 			public void mouseReleased(MouseEvent e){
-				setDrawnCoord();
-				//hopfieldLearning();
-				try{
-					CharacterRecog.pixelPad.setCoord(drawnCoord);
-					CharacterRecog.pixelPad.pixelate();
-					if(debug==1||debug>2){
-						printCoord();
-						printDrawnArray();
-					}
-					if(debug>1)CharacterRecog.pixelPad.printPix();
-					CharacterRecog.pixelPad.drawImage();
-				}catch(Exception error){
-					if(drawnCoord == null){
-						System.err.print("Error in \'setCoord(<int[][]>)\' call.\n"
-								+ "Pixelized array value \'null\'.");
-					}
-					error.printStackTrace();
-				}
-				if(CharacterRecog.train){
-					hopfield.init(trainingList, drawnCoord, sampleChar);
-					CharacterRecog.train = false;
-					
-				}
+				draw();
 			}
 		});
+	}
+	
+	protected void draw(){
+		setDrawnCoord();
+		//hopfieldLearning();
+		try{
+			if(!CharacterRecog.train){
+				CharacterRecog.pixelPad.setCoord(drawnCoord);
+				CharacterRecog.pixelPad.pixelate();
+			}
+			if(debug==1||debug>2){
+				printCoord();
+				printDrawnArray();
+			}
+			if(debug>1)CharacterRecog.pixelPad.printPix();
+			CharacterRecog.pixelPad.drawImage();
+		}catch(Exception error){
+			if(drawnCoord == null){
+				System.err.print("Error in \'setCoord(<int[][]>)\' call.\n"
+						+ "Pixelized array value \'null\'.");
+			}
+			error.printStackTrace();
+		}
+		if(CharacterRecog.train){
+			hopfield.init(trainingList, drawnCoord, sampleChar);
+			CharacterRecog.pixelPad.setCoord(hopfield.activateFunction());
+			CharacterRecog.pixelPad.pixelate();
+			CharacterRecog.pixelPad.drawImage();
+			hopfield.sort();
+			//CharacterRecog.train = false;
+		}
+	}
+	
+	protected void train(){
 	}
 	
 	private void init(){
@@ -263,9 +275,7 @@ class DrawPanel extends JComponent{
 	
 	//add new matrix to the arrayList
 	protected void setSampleChar(String tChar){
-		if(!CharacterRecog.passed){
-			sampleChar.add(tChar);
-		}
+		sampleChar.add(sampleCount, tChar);
 	}
 	
 }
