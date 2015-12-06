@@ -16,6 +16,7 @@ public class CharacterRecog{
 	protected static Pixelator pixelPad;
 	protected static DrawPanel drawPad;
 	static JFrame frame = new JFrame("Fuzzy Character Recognition");
+	static JTextArea matchScreen;
 	protected static String fontChar;
 	protected static boolean passed = false;
 	protected static int multiplier;
@@ -60,6 +61,7 @@ public class CharacterRecog{
 		//This sets the size of the panel and its segments
 		//panel.setLayout(new GridLayout(7,1));
 		panel.setLayout(null);
+		panel.setBackground(Color.DARK_GRAY);
 		panel.setPreferredSize(new Dimension(32, 68));
 		panel.setMinimumSize(new Dimension(32, 68));
 		panel.setMaximumSize(new Dimension(32, 68));
@@ -73,7 +75,7 @@ public class CharacterRecog{
 		
 		
 		//output screen for matches
-		final JTextArea matchScreen = new JTextArea();
+		matchScreen = new JTextArea();
 		matchScreen.setPreferredSize(new Dimension(32, 68));
 		matchScreen.setMinimumSize(new Dimension(32, 68));
 		matchScreen.setMaximumSize(new Dimension(32, 68));

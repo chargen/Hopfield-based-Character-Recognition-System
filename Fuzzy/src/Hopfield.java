@@ -27,6 +27,11 @@ public class Hopfield{
 		XDIMENSION = 7 * multiplier;
 		YDIMENSION = 9 * multiplier;
 	}
+    
+    public Hopfield(int x, int y){
+    	XDIMENSION = x;
+    	YDIMENSION = y;
+    }
 	
 	public void init(ArrayList<double[][]> matricesList, double[][] myEntry, ArrayList<String> labels){
 		numberSamples = XDIMENSION*YDIMENSION;														//set the number of neurons		
@@ -42,7 +47,6 @@ public class Hopfield{
 		entryCoord = new double[XDIMENSION*YDIMENSION][1];	
 		trainingChar = new ArrayList<String>();
 		trainingList = new ArrayList<double[][]>();
-		
 		makeInput(matricesList, myEntry, labels);													//takes the inputs and transforms them into arrays.
 		
 		calculate();																				//start calculating
@@ -57,14 +61,10 @@ public class Hopfield{
 			inputXtransp = sum((multiply(trainingList.get(i), matrixT)),inputXtransp);				//sum of multiplied matrices
 		}
 		weights = subtract(inputXtransp,identityXpattern());
-		activateFunction();
+		CharacterRecog.pixelPad.setCoord(activateFunction());
+		CharacterRecog.pixelPad.pixelate();
 		
-		/*for(int a=0; a<numberSamples; a++){
-			for(int b=0; b<numberSamples; b++){
-				System.out.print(weights[a][b]);
-			}
-			System.out.println();
-		}*/
+		sort();
 	}
 		
 	
@@ -112,47 +112,83 @@ public class Hopfield{
 	
 	//==================================================== didn't test ===================================================
 	
-	public void activateFunction(){
+	public double[][] activateFunction(){
 	
 		boolean run = true;
-		int count = 0, inc = 0;
+		int count = 0;
+		double[][] output = null;
 		while(run){
-			double[][] output = sign(subtract(multiply(weights, entryCoord), thresholds));
-			
-			for(int i = 0; i < trainingList.size(); i++){
-				for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
-					double tLval = trainingList.get(i)[j][0];
-					if(tLval == output[j][0]){
-						count++;
+			output = sign(subtract(multiply(weights, entryCoord), thresholds));
+				for(int i = 0; i < trainingList.size(); i++){
+					for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
+						if(trainingList.get(i)[j][0] == output[j][0]){
+							count++;
+						}
+						if(count == (XDIMENSION * YDIMENSION)){
+							run = false;
+							for(int k = 0; k < output.length; k++){
+								System.out.print(output[k][0] + " ");
+								
+							}
+								
+						}
 					}
-				}
-				matchList[i] = count;
-				posList[i] = i;
-				
-				
-				if(count == output.length)
-					run = false;
-			}	
+					count = 0;
+				}	
+	
 		}
-		newSort.setSortArray(posList, matchList);	
-		int[] returnArray = newSort.sortArray(0, posList.length);
-		
-		
-		
+		return makeGrid(output);
 	}
 		
+	public void sort(){
 		
+		matchList = new int[trainingList.size()];
+		posList = new int[trainingList.size()];
+		int count = 0;
+		for(int i = 0; i < trainingList.size(); i++){
+			for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
+				if(trainingList.get(i)[j][0] == entryCoord[j][0]){
+					count++;
+				}
+			}
+			matchList[i] = count;
+			posList[i] = i;
+			count = 0;
+		}
+		newSort.setSortArray(posList, matchList);	
+		int[] returnArray = newSort.sortArray(0, matchList.length - 1, false);
+		int size = returnArray.length - 1;
+		int[] countArray = newSort.getRankArray();
+		
+		for(int i = size; i >= 0; i--){
+			System.out.print("\n"+ trainingChar.get(returnArray[i]) + "-" +
+					((double)(countArray[i])/(XDIMENSION * YDIMENSION))*100 + "%\n");
+		}
+	}
 	
+	
+
+	public double[][] makeGrid(double[][] myEntry){
+		double[][] grid = new double[XDIMENSION][YDIMENSION];
+		int i,j,k=0;
+		for(i=0;i<YDIMENSION;i++){
+			for(j=0;j<XDIMENSION;j++){
+				grid[j][i]=(int)myEntry[k][0];
+				k++;
+			}
+		}
+		return grid;
+	}
 	
 	 //takes the inputs and transforms them into arrays.
 	 public void makeInput(ArrayList<double[][]> matricesList, double[][] myEntry, ArrayList<String> labels){
-		 int i,j,k,l=0;		 
+		 int l=0;		 
 		 
-		 for(i=0;i<matricesList.size();i++){
+		 for(int i=0;i<matricesList.size();i++){
 			 double[][] aux = new double[XDIMENSION*YDIMENSION][1];
-			 for(j=0;j<YDIMENSION;j++){
-				 for(k=0;k<XDIMENSION;k++){				 
-					 aux[l++][0] = matricesList.get(i)[j][k];
+			 for(int j=0;j<YDIMENSION;j++){
+				 for(int k=0;k<XDIMENSION;k++){				 
+					 aux[l++][0] = matricesList.get(i)[k][j];
 				 }
 			 }			 
 			 trainingChar.add(labels.get(i));	 
@@ -160,29 +196,32 @@ public class Hopfield{
 			 l=0;	 		 
 		 }
 		 
-		 for(j=0;j<YDIMENSION;j++){
-			 for(k=0;k<XDIMENSION;k++){
-				 entryCoord[l++][0] = myEntry[j][k];
+		 for(int j=0;j<YDIMENSION;j++){
+			 for(int k=0;k<XDIMENSION;k++){
+				 entryCoord[l++][0] = myEntry[k][j];
 			 }
 		 }
 	 }
 	 
-	//example of usage
+/*	//example of usage
 	public static void main(String[] args){
 			@SuppressWarnings("unused")
-			Hopfield hp = new Hopfield(CharacterRecog.multiplier);
+			Hopfield hp = new Hopfield(2, 3);
 			ArrayList<double[][]> matricesList = new ArrayList<double[][]>(2);
 			ArrayList<String> labels = new ArrayList<String>(2);
 			double[][] matrix1 = {{1,1},{1,1},{1,1}};
-			//int[][] matrix1 = {{2,1},{4,1},{6,1}};
 			double[][] matrix2 = {{-1,-1},{-1,-1},{-1,-1}};
-			double[][] myEntry = {{-1,-1},{-1,-1},{-1,1}};
+			double[][] matrix3 = {{1,1},{1,-1},{-1,-1}};
+			
+			double[][] myEntry = {{1,1},{-1,-1},{1,1}};
 			
 			matricesList.add(matrix1);
 			labels.add("A");
 			matricesList.add(matrix2);
 			labels.add("B");
+			matricesList.add(matrix3);
+			labels.add("C");
 			
 			hp.init(matricesList, myEntry, labels);
-		}
+		}*/
 }

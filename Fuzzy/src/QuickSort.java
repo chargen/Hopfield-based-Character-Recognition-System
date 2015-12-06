@@ -47,7 +47,7 @@ public class QuickSort<T> {
 	 */
 	public int[] sortArray(int lo, int hi, boolean print){
 		
-		int lower = lo, high = (hi - 1);
+		int lower = lo, high = hi;
 		int pivot = rankArray[findPivot(lower, high)];
 		while(lower <= high){
 			while(rankArray[lower] < pivot)
