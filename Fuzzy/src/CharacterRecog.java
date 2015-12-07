@@ -15,7 +15,7 @@ public class CharacterRecog{
 	protected static final int HEIGHT = 300;
 	protected static Pixelator pixelPad;
 	protected static DrawPanel drawPad;
-	static JFrame frame = new JFrame("Fuzzy Character Recognition");
+	static JFrame frame = new JFrame("Hopfield Character Recognition");
 	static JTextArea matchScreen;
 	protected static String fontChar;
 	protected static int multiplier;
@@ -47,10 +47,6 @@ public class CharacterRecog{
 			
 		contentPane.add(drawPad);
 		contentPane.add(pixelPad);
-		
-		final JSlider slider = new JSlider();
-		slider.setMinimum(1);
-		slider.setMaximum(8);
 		JPanel panel = new JPanel();
 		JPanel text = new JPanel();
 		//creates a JPanel		
@@ -71,13 +67,11 @@ public class CharacterRecog{
 		final JButton clearButton = new JButton("Clear");
 		final JButton addButton = new JButton("Add Sample");
 		final JButton testButton = new JButton("Test");
+		final JButton resetButton = new JButton("Discard");
 		
 		
 		//output screen for matches
 		matchScreen = new JTextArea();
-		matchScreen.setPreferredSize(new Dimension(32, 68));
-		matchScreen.setMinimumSize(new Dimension(32, 68));
-		matchScreen.setMaximumSize(new Dimension(32, 68));
 		matchScreen.setEditable(false);
 		
 		JScrollPane matchPane = new JScrollPane(matchScreen,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -103,20 +97,26 @@ public class CharacterRecog{
 		trainButton.setBounds(25, 125, 200, 25);
 		panel.add(trainButton);
 		trainButton.setEnabled(false);
-		slider.setBounds(25, 155, 100, 25);
-		panel.add(slider);
-		slider.setValue(multiplier);
-		slider.addChangeListener(new ChangeListener(){
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				if(slider.getValueIsAdjusting()){
-					drawPad.clear();
-					multiplier = slider.getValue();
-				}
-				init();
+		resetButton.setBounds(25, 155, 100, 25);
+		panel.add(resetButton);
+		resetButton.setEnabled(false);
+		resetButton.addActionListener(new ActionListener(){
 
-			}			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				drawPad.trainingList.clear();
+				drawPad.sampleChar.clear();
+				drawPad.sampleCount = 0;
+				drawPad.clear();
+				trainButton.setEnabled(false);
+				testButton.setEnabled(false);
+				font.setText("");
+				sampleChar.setText("");
+				matchScreen.setText("");
+			}
+			
 		});
+		
 		testButton.setBounds(130, 155, 100, 25);
 		panel.add(testButton);
 		testButton.setEnabled(false);
@@ -128,11 +128,12 @@ public class CharacterRecog{
 					train = false;
 					testButton.setText("Test");
 					trainButton.setEnabled(true);
-					//drawPad.hopfield.matchingPixels = 0;
 					drawPad.clear();
+					resetButton.setEnabled(true);
 				}else{
 					train = true;
 					testButton.setText("Testing...");
+					resetButton.setEnabled(false);
 					trainButton.setEnabled(false);
 				}
 			}
@@ -202,6 +203,7 @@ public class CharacterRecog{
 			public void actionPerformed(ActionEvent arg0) {
 				drawPad.clear();
 				testButton.setEnabled(true);
+				resetButton.setEnabled(true);
 			}
 			
 		});

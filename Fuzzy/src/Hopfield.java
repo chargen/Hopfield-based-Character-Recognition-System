@@ -108,7 +108,7 @@ public class Hopfield implements Runnable{
 	
 	public double[][] sign(double[][] output){
 		for (int i=0; i<numberSamples; i++) {
-			if (output[i][0]>0)
+			if (output[i][0]>=0)
 				output[i][0]=1;
 		    else if(output[i][0]< 0)
 		    	output[i][0]=-1;
@@ -119,19 +119,29 @@ public class Hopfield implements Runnable{
 	//==================================================== didn't test ===================================================
 	
 	public double[][] activateFunction(){
-	
+		activatedPixels = new int[XDIMENSION * YDIMENSION];
 		boolean run = true;
 		int count = 0;
 		double[][] output = null;
+		double[][] outputOld = null;
 		int printval = 0;
 		while(run){
 			output = sign(subtract(multiply(weights, entryCoord), thresholds));
+			int c2 = 0;
+			if(outputOld != null){
+				for(int k = 0; k < output.length; k++){
+					if(output[k][0] == outputOld[k][0]){
+						c2++;
+					}
+				}
+			}
+			outputOld = output;
 				for(int i = 0; i < trainingList.size(); i++){
 					for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
 						if(trainingList.get(i)[j][0] == output[j][0]){
 							count++;
 						}
-						if(count == ((XDIMENSION * YDIMENSION) - 1)){
+						if(count == (XDIMENSION * YDIMENSION)){
 							run = false;
 						}
 						if(count > printval){
@@ -139,9 +149,17 @@ public class Hopfield implements Runnable{
 
 							System.out.println(printval);
 						}
+						if(output[j][0] == 1)
+							matchingPixels++;
 					}
+					activatedPixels[i] = matchingPixels;
 					count = 0;
+					matchingPixels = 0;
 				}
+				
+			if(c2 == (XDIMENSION * YDIMENSION)){
+				run = false;
+			}
 	
 		}
 		System.out.print("Finished.");
@@ -150,7 +168,7 @@ public class Hopfield implements Runnable{
 		
 	public void sort(){
 
-		activatedPixels = new int[XDIMENSION * YDIMENSION];
+		//activatedPixels = new int[XDIMENSION * YDIMENSION];
 		matchList = new int[trainingList.size()];
 		posList = new int[trainingList.size()];
 		int count = 0;
@@ -161,16 +179,16 @@ public class Hopfield implements Runnable{
 				}else if(entryCoord[j][0] == 1 && count > 0){
 					count--;
 				}
-				if(trainingList.get(i)[j][0] == 1)
-					matchingPixels++;
+				/*if(trainingList.get(i)[j][0] == 1)
+					matchingPixels++;*/
 				
 				System.out.println("count: " + count + "\nMatchingPixels: " + matchingPixels);
 			}
 
-			activatedPixels[i] = matchingPixels;
+			//activatedPixels[i] = matchingPixels;
 			matchList[i] = count;
 			posList[i] = i;
-			matchingPixels = 0;
+			//matchingPixels = 0;
 			count = 0;
 		}
 		newSort.setSortArray(posList, matchList);	
@@ -179,7 +197,7 @@ public class Hopfield implements Runnable{
 		int[] countArray = newSort.getRankArray();
 		CharacterRecog.matchScreen.setText("\t"+ trainingChar.get(returnArray[size]) + "-" +
 				new DecimalFormat("#0.00").format(((double)(countArray[size])/activatedPixels[posList[size]])*100) + "%\n");
-		CharacterRecog.pixelPad.setCoord(makeGrid(trainingList.get(posList[size])));
+		//CharacterRecog.pixelPad.setCoord(makeGrid(trainingList.get(posList[size])));
 		for(int i = size - 1; i >= 0; i--){
 			CharacterRecog.matchScreen.append("\t"+ trainingChar.get(returnArray[i]) + "-" +
 				new DecimalFormat("#0.00").format(((double)(countArray[i])/activatedPixels[posList[i]])*100) + "%\n");
