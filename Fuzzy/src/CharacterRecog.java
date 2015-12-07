@@ -80,7 +80,7 @@ public class CharacterRecog{
 		matchScreen.setMaximumSize(new Dimension(32, 68));
 		matchScreen.setEditable(false);
 		
-		JScrollPane matchPane = new JScrollPane(matchScreen, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane matchPane = new JScrollPane(matchScreen,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		final JScrollBar scrollbar = new JScrollBar();
 		matchPane.add(scrollbar);
 		

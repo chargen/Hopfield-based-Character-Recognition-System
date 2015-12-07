@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import Jama.Matrix;
 
@@ -11,7 +12,7 @@ public class Hopfield implements Runnable{
 	private int[] classificationList;	
 	protected int[] activatedPixels;
 	protected int matchingPixels = 0;
-	//percentage of classification for each entry  
+	//percentage of classification for each entry 
 	
 	QuickSort<int[]> newSort = new QuickSort<int[]>();
 	
@@ -107,9 +108,9 @@ public class Hopfield implements Runnable{
 	
 	public double[][] sign(double[][] output){
 		for (int i=0; i<numberSamples; i++) {
-			if (output[i][0]>=0)
+			if (output[i][0]>0)
 				output[i][0]=1;
-		    else
+		    else if(output[i][0]< 0)
 		    	output[i][0]=-1;
         }
 		return output;
@@ -122,29 +123,34 @@ public class Hopfield implements Runnable{
 		boolean run = true;
 		int count = 0;
 		double[][] output = null;
-		activatedPixels = new int[XDIMENSION * YDIMENSION];
+		int printval = 0;
 		while(run){
 			output = sign(subtract(multiply(weights, entryCoord), thresholds));
 				for(int i = 0; i < trainingList.size(); i++){
 					for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
 						if(trainingList.get(i)[j][0] == output[j][0]){
 							count++;
-							/*if(output[j][0] == 1)
-								matchingPixels++;*/
 						}
-						if(count == (XDIMENSION * YDIMENSION)){
+						if(count == ((XDIMENSION * YDIMENSION) - 1)){
 							run = false;
+						}
+						if(count > printval){
+							printval = count;
+
+							System.out.println(printval);
 						}
 					}
 					count = 0;
 				}
 	
 		}
+		System.out.print("Finished.");
 		return makeGrid(output);
 	}
 		
 	public void sort(){
-		
+
+		activatedPixels = new int[XDIMENSION * YDIMENSION];
 		matchList = new int[trainingList.size()];
 		posList = new int[trainingList.size()];
 		int count = 0;
@@ -152,9 +158,13 @@ public class Hopfield implements Runnable{
 			for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
 				if(trainingList.get(i)[j][0] == entryCoord[j][0] && entryCoord[j][0] == 1){
 					count++;
+				}else if(entryCoord[j][0] == 1 && count > 0){
+					count--;
 				}
 				if(trainingList.get(i)[j][0] == 1)
 					matchingPixels++;
+				
+				System.out.println("count: " + count + "\nMatchingPixels: " + matchingPixels);
 			}
 
 			activatedPixels[i] = matchingPixels;
@@ -167,16 +177,15 @@ public class Hopfield implements Runnable{
 		int[] returnArray = newSort.sortArray(0, matchList.length - 1);
 		int size = returnArray.length - 1;
 		int[] countArray = newSort.getRankArray();
-		newSort.setSortArray(activatedPixels, matchList);
-		int[] matchingArray = newSort.sortArray(0, matchList.length - 1);
 		CharacterRecog.matchScreen.setText("\t"+ trainingChar.get(returnArray[size]) + "-" +
-				((double)(countArray[size])/matchingArray[size])*100 + "%\n");
-		//matchingPixels = 0;
+				new DecimalFormat("#0.00").format(((double)(countArray[size])/activatedPixels[posList[size]])*100) + "%\n");
+		CharacterRecog.pixelPad.setCoord(makeGrid(trainingList.get(posList[size])));
 		for(int i = size - 1; i >= 0; i--){
 			CharacterRecog.matchScreen.append("\t"+ trainingChar.get(returnArray[i]) + "-" +
-					((double)(countArray[i])/matchingArray[i])*100 + "%\n");
-			//matchingPixels = 0;
+				new DecimalFormat("#0.00").format(((double)(countArray[i])/activatedPixels[posList[i]])*100) + "%\n");
 		}
+		returnArray = null;
+		countArray = null;
 	}
 	
 	

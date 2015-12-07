@@ -82,7 +82,13 @@ class DrawPanel extends JComponent{
 		
 		//when mouse is released, pixel values are generated and drawn
 		addMouseListener(new MouseAdapter(){
+			
 			public void mouseReleased(MouseEvent e){
+				currentX = e.getX();
+				currentY = e.getY();
+				try{
+					setCoord(currentX, currentY);
+				}catch(Exception err){}
 				draw();
 			}
 		});
@@ -111,7 +117,7 @@ class DrawPanel extends JComponent{
 		}
 		if(CharacterRecog.train){
 			hopfield.init(trainingList, drawnCoord, sampleChar);
-			CharacterRecog.pixelPad.setCoord(hopfield.activateFunction());
+			//CharacterRecog.pixelPad.setCoord(hopfield.activateFunction());
 			hopfield.sort();
 			CharacterRecog.pixelPad.pixelate();
 			CharacterRecog.pixelPad.drawImage();
