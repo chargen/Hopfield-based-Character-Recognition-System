@@ -22,6 +22,7 @@ public class CharacterRecog{
 	protected static volatile boolean train = false;
 	private static Hopfield hopfield;
 	static CharacterRecog myProgram;
+	protected static volatile boolean tOutput = false;
 	
 	final static JButton trainButton = new JButton("Train Network");
 	
@@ -68,6 +69,7 @@ public class CharacterRecog{
 		final JButton addButton = new JButton("Add Sample");
 		final JButton testButton = new JButton("Test");
 		final JButton resetButton = new JButton("Discard");
+		final JCheckBox outputBox = new JCheckBox("Draw Input Characters");
 		
 		
 		//output screen for matches
@@ -136,6 +138,16 @@ public class CharacterRecog{
 					resetButton.setEnabled(false);
 					trainButton.setEnabled(false);
 				}
+			}
+			
+		});
+		outputBox.setBounds(25, 190, 200, 25 );
+		panel.add(outputBox);
+		outputBox.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				tOutput = outputBox.isSelected();
 			}
 			
 		});

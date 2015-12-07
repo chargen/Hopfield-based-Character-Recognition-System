@@ -195,13 +195,15 @@ public class Hopfield implements Runnable{
 		int[] returnArray = newSort.sortArray(0, matchList.length - 1);
 		int size = returnArray.length - 1;
 		int[] countArray = newSort.getRankArray();
-		CharacterRecog.matchScreen.setText("\t"+ trainingChar.get(returnArray[size]) + "-" +
-				new DecimalFormat("#0.00").format(((double)(countArray[size])/activatedPixels[posList[size]])*100) + "%\n");
-		//CharacterRecog.pixelPad.setCoord(makeGrid(trainingList.get(posList[size])));
-		for(int i = size - 1; i >= 0; i--){
-			CharacterRecog.matchScreen.append("\t"+ trainingChar.get(returnArray[i]) + "-" +
-				new DecimalFormat("#0.00").format(((double)(countArray[i])/activatedPixels[posList[i]])*100) + "%\n");
-		}
+		try{
+			CharacterRecog.matchScreen.setText("Best Guess: "+ trainingChar.get(returnArray[size]) + "\nwith " +
+				new DecimalFormat("#0.00").format(((double)(countArray[size])/activatedPixels[posList[size]])*100) + "% Certainty\n\n");
+			if(CharacterRecog.tOutput)CharacterRecog.pixelPad.setCoord(makeGrid(trainingList.get(posList[size])));
+			for(int i = size - 1; i >= 0; i--){
+				CharacterRecog.matchScreen.append("\t"+ trainingChar.get(returnArray[i]) + "-" +
+						new DecimalFormat("#0.00").format(((double)(countArray[i])/activatedPixels[posList[i]])*100) + "%\n");
+			}
+		}catch(Exception e){}
 		returnArray = null;
 		countArray = null;
 	}
