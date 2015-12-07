@@ -34,7 +34,7 @@ class DrawPanel extends JComponent{
 	protected ArrayList<double[][]> trainingList = new ArrayList<double[][]>();
 	protected ArrayList<String> sampleChar = new ArrayList<String>();
 	private static int sampleCount = 0;
-	private Hopfield hopfield;
+	protected Hopfield hopfield;
 	//set debug mode by adjusting this value.
 	//OFF-0, MATRIX-1, PIXELS-2, MATRIX_AND_PIXELS-3
 	int debug = 0;
@@ -112,10 +112,9 @@ class DrawPanel extends JComponent{
 		if(CharacterRecog.train){
 			hopfield.init(trainingList, drawnCoord, sampleChar);
 			CharacterRecog.pixelPad.setCoord(hopfield.activateFunction());
+			hopfield.sort();
 			CharacterRecog.pixelPad.pixelate();
 			CharacterRecog.pixelPad.drawImage();
-			hopfield.sort();
-			//CharacterRecog.train = false;
 		}
 	}
 	

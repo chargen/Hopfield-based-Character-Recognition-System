@@ -23,7 +23,7 @@ public class CharacterRecog{
 	private static Hopfield hopfield;
 	static CharacterRecog myProgram;
 	
-	final static JButton trainButton = new JButton("Train");
+	final static JButton trainButton = new JButton("Train Network");
 	
 	public CharacterRecog(int mult){
 		multiplier = mult;
@@ -128,6 +128,8 @@ public class CharacterRecog{
 					train = false;
 					testButton.setText("Test");
 					trainButton.setEnabled(true);
+					//drawPad.hopfield.matchingPixels = 0;
+					drawPad.clear();
 				}else{
 					train = true;
 					testButton.setText("Testing...");
