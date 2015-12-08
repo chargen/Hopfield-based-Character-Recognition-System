@@ -116,6 +116,7 @@ class DrawPanel extends JComponent{
 			error.printStackTrace();
 		}
 		if(CharacterRecog.train){
+			CharacterRecog.pixelPad.clear();
 			hopfield.init(trainingList, drawnCoord, sampleChar);
 			if(!CharacterRecog.tOutput)CharacterRecog.pixelPad.setCoord(hopfield.activateFunction());
 			hopfield.sort();

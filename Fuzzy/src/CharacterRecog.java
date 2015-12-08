@@ -22,7 +22,7 @@ public class CharacterRecog{
 	protected static volatile boolean train = false;
 	private static Hopfield hopfield;
 	static CharacterRecog myProgram;
-	protected static volatile boolean tOutput = false;
+	protected static volatile boolean tOutput = true;
 	
 	final static JButton trainButton = new JButton("Train Network");
 	
@@ -108,6 +108,8 @@ public class CharacterRecog{
 			public void actionPerformed(ActionEvent e) {
 				drawPad.trainingList.clear();
 				drawPad.sampleChar.clear();
+				drawPad.hopfield.activatedPixels = 
+						new int[(XDIMENSION * multiplier) * (YDIMENSION * multiplier)];
 				drawPad.sampleCount = 0;
 				drawPad.clear();
 				trainButton.setEnabled(false);
@@ -143,6 +145,7 @@ public class CharacterRecog{
 		});
 		outputBox.setBounds(25, 190, 200, 25 );
 		panel.add(outputBox);
+		outputBox.setSelected(true);
 		outputBox.addActionListener(new ActionListener(){
 
 			@Override

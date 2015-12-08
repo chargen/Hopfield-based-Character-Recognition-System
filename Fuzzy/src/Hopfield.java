@@ -11,7 +11,6 @@ public class Hopfield implements Runnable{
 	private double[][] entryCoord;																		//input matrix
 	private int[] classificationList;	
 	protected int[] activatedPixels;
-	protected int matchingPixels = 0;
 	//percentage of classification for each entry 
 	
 	QuickSort<int[]> newSort = new QuickSort<int[]>();
@@ -29,10 +28,12 @@ public class Hopfield implements Runnable{
     Thread hopThread;
 	
 	public Hopfield(int multiplier){
+		
 		hopThread = new Thread(this);
 		hopThread.start();
 		XDIMENSION = 7 * multiplier;
 		YDIMENSION = 9 * multiplier;
+		activatedPixels = new int[XDIMENSION * YDIMENSION];
 	}
     
     public Hopfield(int x, int y){
@@ -40,6 +41,7 @@ public class Hopfield implements Runnable{
 		hopThread.start();
     	XDIMENSION = x;
     	YDIMENSION = y;
+    	activatedPixels = new int[XDIMENSION * YDIMENSION];
     }
 	
 	public void init(ArrayList<double[][]> matricesList, double[][] myEntry, ArrayList<String> labels){
@@ -119,90 +121,67 @@ public class Hopfield implements Runnable{
 	//==================================================== didn't test ===================================================
 	
 	public double[][] activateFunction(){
-		activatedPixels = new int[XDIMENSION * YDIMENSION];
-		boolean run = true;
+		
+		return makeGrid(activateFunction(entryCoord, 100));
+	}
+	
+	
+	private double[][] activateFunction(double[][] out, int epoch){
 		int count = 0;
-		double[][] output = null;
-		double[][] outputOld = null;
-		int printval = 0;
-		while(run){
-			output = sign(subtract(multiply(weights, entryCoord), thresholds));
-			int c2 = 0;
-			if(outputOld != null){
-				for(int k = 0; k < output.length; k++){
-					if(output[k][0] == outputOld[k][0]){
-						c2++;
-					}
-				}
-			}
-			outputOld = output;
-				for(int i = 0; i < trainingList.size(); i++){
-					for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
-						if(trainingList.get(i)[j][0] == output[j][0]){
-							count++;
-						}
-						if(count == (XDIMENSION * YDIMENSION)){
-							run = false;
-						}
-						if(count > printval){
-							printval = count;
-
-							System.out.println(printval);
-						}
-						if(output[j][0] == 1)
-							matchingPixels++;
-					}
-					activatedPixels[i] = matchingPixels;
-					count = 0;
-					matchingPixels = 0;
+		double[][] output = sign(subtract(multiply(weights, out), thresholds));
+		activatedPixels = new int[XDIMENSION * YDIMENSION];
+		for(int i = 0; i < trainingList.size(); i++){
+			for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
+				if(trainingList.get(i)[j][0] == output[j][0]){
+					count++;
 				}
 				
-			if(c2 == (XDIMENSION * YDIMENSION)){
-				run = false;
+				if(output[j][0] == 1)
+					activatedPixels[i]++;
 			}
-	
+			if(count != (XDIMENSION * YDIMENSION) && epoch >= 0){
+				return activateFunction(output, epoch - 1);
+			}
+			count = 0;
+			
 		}
-		System.out.print("Finished.");
-		return makeGrid(output);
+		return output;
 	}
+	
 		
 	public void sort(){
 
 		//activatedPixels = new int[XDIMENSION * YDIMENSION];
 		matchList = new int[trainingList.size()];
 		posList = new int[trainingList.size()];
-		int count = 0;
 		for(int i = 0; i < trainingList.size(); i++){
 			for(int j = 0; j < (XDIMENSION * YDIMENSION); j++){
 				if(trainingList.get(i)[j][0] == entryCoord[j][0] && entryCoord[j][0] == 1){
-					count++;
-				}else if(entryCoord[j][0] == 1 && count > 0){
-					count--;
+					matchList[i]++;
+				}else if(entryCoord[j][0] == 1 && matchList[i] > 0){
+					matchList[i]--;
 				}
-				/*if(trainingList.get(i)[j][0] == 1)
-					matchingPixels++;*/
 				
-				System.out.println("count: " + count + "\nMatchingPixels: " + matchingPixels);
+				System.out.println("count: " + matchList[i] + "\nMatchingPixels: " + activatedPixels[i]);
 			}
-
-			//activatedPixels[i] = matchingPixels;
-			matchList[i] = count;
 			posList[i] = i;
-			//matchingPixels = 0;
-			count = 0;
 		}
 		newSort.setSortArray(posList, matchList);	
 		int[] returnArray = newSort.sortArray(0, matchList.length - 1);
 		int size = returnArray.length - 1;
 		int[] countArray = newSort.getRankArray();
 		try{
+			if(CharacterRecog.tOutput){
+				activateFunction();
+				CharacterRecog.pixelPad.setCoord(makeGrid(trainingList.get(posList[size])));
+			}
 			CharacterRecog.matchScreen.setText("Best Guess: "+ trainingChar.get(returnArray[size]) + "\nwith " +
 				new DecimalFormat("#0.00").format(((double)(countArray[size])/activatedPixels[posList[size]])*100) + "% Certainty\n\n");
-			if(CharacterRecog.tOutput)CharacterRecog.pixelPad.setCoord(makeGrid(trainingList.get(posList[size])));
 			for(int i = size - 1; i >= 0; i--){
 				CharacterRecog.matchScreen.append("\t"+ trainingChar.get(returnArray[i]) + "-" +
 						new DecimalFormat("#0.00").format(((double)(countArray[i])/activatedPixels[posList[i]])*100) + "%\n");
 			}
+			
 		}catch(Exception e){}
 		returnArray = null;
 		countArray = null;
