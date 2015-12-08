@@ -122,7 +122,7 @@ public class Hopfield implements Runnable{
 	
 	public double[][] activateFunction(){
 		
-		return makeGrid(activateFunction(entryCoord, 100));
+		return makeGrid(activateFunction(entryCoord, 1000));
 	}
 	
 	
@@ -138,10 +138,11 @@ public class Hopfield implements Runnable{
 				
 				if(output[j][0] == 1)
 					activatedPixels[i]++;
+				if(count != (XDIMENSION * YDIMENSION) && epoch >= 0)
+					return activateFunction(output, epoch - 1);
+				
 			}
-			if(count != (XDIMENSION * YDIMENSION) && epoch >= 0){
-				return activateFunction(output, epoch - 1);
-			}
+			
 			count = 0;
 			
 		}
